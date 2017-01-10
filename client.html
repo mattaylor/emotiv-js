@@ -30,30 +30,24 @@ var specs = [
 	},
 	{ name: 'metrics',
 		data: [],
-		proc: (evt, res=[]) => {
-			mKeys.map(key => res.push({offset: evt.offset, val: evt[key.substring(0,3)], cat: key}))
-			return res
-		},
+		proc: evt => mKeys.map(key => ({ offset: evt.offset, val: evt[key.substring(0,3)], cat: key })),
 		mark: 'line',
 		padding: 5,
 		width: 500,
 		encoding: {
 			x: { field: "offset", axis: { format: '%M:%S' }, type: "temporal" },
 			y: { field: "val", type: "quantitative" },
-			color: { field:"cat", type: "nominal"}
+			color: { field:"cat", type: "nominal" }
 		}
 	}
 ]
 
 specs.map(spec => { 
-	vg.embed('#'+spec.name, { mode:'vega-lite', spec: spec}, (err, res) => {
+	vg.embed('#'+spec.name, { mode:'vega-lite', spec: spec }, (err, res) => {
 		if (err) return 
-		//var data = res.view.data('source') //spec.name)
-		console.log(res.view)
 		var data = res.view.data(spec.name+'_source')
 		cortex.on(spec.name, evt => {
 			evt.offset = parseInt(evt._id.match(/\+(\d+)/)[1])
-			console.log(evt)
 			data.remove(d => d.offset < (evt.offset - 10000))
 			data.insert(spec.proc(evt))
 			res.view.update()
