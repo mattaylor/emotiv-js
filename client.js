@@ -3,7 +3,7 @@ class Cortex {
 
   constructor (opts = {}, next) {
     Object.assign(this, { opts:opts, api:{}, _rpc:{}, _evt:{}, queue:[]})
-    this.sock = new WebSocket('ws://'+(opts.host||'localhost')+':'+(opts.port||8080))
+    this.sock = new WebSocket('ws://'+(opts.host||'localhost')+':'+(opts.port||8000))
     this.sock.onopen = () => this.queue.map(_ => this.sock.send(JSON.stringify(this.queue.shift())))
     if (opts.appId) this.auth(opts)
     this.sock.onmessage = msg => {

@@ -1,4 +1,6 @@
-## Simple Cortex Mocking Service.
+## Emotiv Cortex JS Client and Mock Service.
+
+ALPHA!
 
 ### Getting Started 
 
@@ -107,17 +109,9 @@ client.on('command', event => { /* do something */ })
 ```
 __Auto Discovery:__
 ```
-new Cortex({host: 'ws://localhost:80080', appId:'myApp', licId:'myLic'}, client => {
+new Cortex({appId:'myApp', licId:'myLic'}, client => {
   client.api.createSession().then(session => {/* do something */})
   client.on('sensors', event => { /* do something */ })
 })
-```
-
-__Mental Commands:__
-```
-```
-
-__Facial Expressions:__
-```
 ```
 
