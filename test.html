@@ -1,0 +1,54 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Cortex Test</title>
+  <link rel="stylesheet" media="all" href="https://cdn.rawgit.com/visionmedia/mocha/master/mocha.css">
+</head>
+<body>
+<div id="mocha"><p><a href=".">Index</a></p></div>
+<div id="messages"></div>
+<div id="fixtures"></div>
+<script src="https://cdn.rawgit.com/visionmedia/mocha/master/mocha.js"></script>
+<script src="http://chaijs.com/chai.js"></script>
+<script src="./client.js"></script>
+<script>
+var expect = chai.expect
+mocha.setup('bdd')
+
+var creds = { appId: 'myApp1'}
+
+var client = new Cortex({}) 
+//, client => {
+  
+	describe("cortex", () => {
+    
+    describe("discovery", () => {
+      it("should have rpc methods", () => expect(client.api).to.exist)
+    })
+    
+    describe("account", () => {
+      it("authorize should define tokens",  () => client.auth(creds).then(_ => expect(client.creds).to.have.property("_auth")))
+      it("userInfo should return user info",() => client.auth(creds).then(_ => client.api.userInfo()).then(_ => expect(_.email).to.exist))
+    })
+
+    describe("session", () => {
+      it("create should fail if unauthorized", () => client.call("createSession").catch(_ => expect(_.error).to.exist))
+      it("create should return a new session", () => client.auth(creds).then(_ => client.api.createSession()).then(_ => expect(_.headset).to.exist))
+    })
+
+    describe("headset", () => {
+      //it("list should list headsets", () => client.call("headset.list").then(_ => expect(_.result).to.exist))
+    })
+
+    describe("emitter", () => { 
+      it("should publish sensors events", () => client.on('sensors').then(_ =>  expect(_._id).to.match(/^sen:/)))
+      it("should publish motions events", () => client.on('motions').then(_ =>  expect(_._id).to.match(/^mot:/)))
+      it("should publish facials events", () => client.on('facexps').then(_ =>  expect(_._id).to.match(/^fac:/)))
+      it("should publish eegData events", () => client.on('eegdata').then(_ =>  expect(_._id).to.match(/^eeg:/)))
+      it("should publish metrics events", () => client.on('metrics').then(_ =>  expect(_._id).to.match(/^met:/)))
+    })
+ 	})
+  mocha.run()
+</script>
+</body>
+</html>

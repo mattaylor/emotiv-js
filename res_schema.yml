@@ -1,0 +1,91 @@
+- title: license
+  description: |
+    A License to use cortex / sdk.
+  type: object
+  properties:
+    _id: { pattern: 'lic:\w{8}', notes: 'License key' }
+    name : { notes: 'Optional User defined license name', type: string }
+    scope  : { enum: [basic, extra, prime] }
+    owner  : { notes: License Owner EmoID, pattern: 'emo:\w+' }
+    appId  : { type: string,  pattern: 'app:\w+', notes: If not null, auth request appId must match this substring }
+    emoId  : { type: string,  pattern: 'emo:\w+', notes: If not null, auth request emoId must match this substring }
+    secret : { type: string, notes: Optional Secret that may be used to sign auth requests as SHA256 HMAC }
+    balance: { type: integer, notes: Available Session Balance }
+    maxDev : { type: integer, notes: Maximum Devices allowed - default is amount / 10 ) }
+    devIds : { type: array, items: string,  title: Current Devices Using License }
+    amount : { type: integer, notes: Initial balance purchased with subscription  } 
+    topups : { type: integer, title:  Additonal topup sessions, (Maximum Session balance to roll over to next billing period }
+    status : { enum: [active, suspended, expired, pending ] }
+    renewal: { type: string, format: date-time, notes: Expiration Date of current billing period } 
+    period : { type: integer, notes: Billing period in days }
+ 
+- title: headset
+  description: An EEG Headset
+  type: object
+  properties: &headset
+    _id: { title: 'BT serial id', pattern: '(INSIGHT | EPOC)-\w{8}' }
+    name: {  title: 'user supplied headset name', type: string }
+    iface: { enum: [BTLE, DONGLE] }
+    dongle: { pattern: 'U\d{8}', notes: 'Dongle serial Id'}
+    status: { enum: [ CONNECTED, DISCONNECTED, INUSE ] }
+    serial: { type: string }
+    version: { type: string, notes: Hardware version }
+    firmware: { pattern: 'v\d\.\d{2}', notes: 'Firmware version' }
+    sensors: { type: array, items: { pattern: '\w{2}', notes: EEG Sensor Names } }
+    settings: 
+      type: object
+      properties: 
+        mode: { enum: [EPOC, EPOC+] }
+        eegRate:  { enum: [0, 64, 128, 256 ] }
+        eegRes:   { enum: [16, 14] }
+        memsRate: { enum: [0, 64, 128, 256 ] }
+        memsRes:  { enum: [16, 14] }
+
+- title: session
+  description: | 
+    Represents an continuous period of eeg related activity using an emotive headset.
+
+  required: [_id]
+  properties: 
+    _id: { pattern: 'ses:\w{4}.\d{8}', notes: 'ses:{emoId}.{start time in epoch ms}' }
+    emoId: { pattern: 'emo:\w{4}', notes: Emotive User Id }
+    licId: { pattern: 'lic:\w{8}', notes: License used to create session }
+    proId: { pattern: 'pro:\w{8}', notes: Profile used for commands / facials detections }
+    appId: { pattern: 'app:\w{8}', notes: Client Application Identifier}
+    time:  { type: string, format: date-time,  notes: Session start time }
+    shared: { type: boolean, notes: 'If true the session can be accessed by same user under differnet licenses'} 
+    length: { type: number, notes: Length in seconds }
+    status: { enum: [active, error, closed ], notes: 'error if session less than 1 minute'}
+    record: { type: boolean, notes: 'Recording on / off' }
+    tags: { type: array, items: { type: string }, notes: Tags for this session }
+    headset: { $ref: headset }
+    _attachments: 
+      type: array
+      notes: Event Log file names for each 10 sec window 
+      items: { pattern: '(eeg|met|mot|com|exp)\:\d{4}' }
+   
+- title: profile
+  description: |
+    Training Profiles for Mental Commands and facial expressions.
+  properties:
+    _id: { pattern: 'pro:\w{4}.\d', notes: 'pro:{emoId}.{index}' }
+    name: { type: string, notes: Profile name }
+    emoId: { pattern: 'emo:\w{8}', notes: The Emo user that created this profile }
+    appId: { pattern: 'app:\w{8}', notes: The application that created this Profile }
+    ratings: { type: array, length: 4, items: { type: number, minimum: 0, maximum: 100 }, notes: Mental Command Skill Ratings }
+    command: { type: array, items: { pattern: '\w{8}' }, notes: Names of Mental Commands' }
+    tags: { type: array, items: { pattern: '\w{8}' } }
+    _attachments: { type: array, items: { items: { pattern: '(com|fac)\:\w{4}' } } }
+   
+- title: emoUser
+  description: A Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
+  properties:
+    _id: { pattern: 'emo:\w{8}(/\w{8})?', notes: 'emo:{emoId}/{name}' }
+    name: { type: string }
+    hand: { enum: [right, left, any] }
+    yob : { type: integer, minimum: 1900, maximum: 2100 }
+    sex : { enum: [male, female], notes: Biological sexual identity }
+    trans: { enum: [SEXUAL, GENDER, POSTOP, PREOP, VESTITE, NONE] }
+    email: { type: string, format: email }
+    tags: { type: array, items: { pattern: '\w{8}' } }
+    

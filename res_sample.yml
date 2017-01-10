@@ -1,0 +1,55 @@
+Headset: &headset
+  _id: INSIGHT-1234
+  name: My INSIGHT
+  status: connected
+  version: INSIGHT.v1
+  sensors: [AF3, AF4, AF5, EE1, EE2]
+  settings: 
+    eegRate: 33
+    eegRes: 55
+    memsRate: 55
+    memsRes: 55
+  firmware: v1.23
+
+Session:
+  _id: ses:1234.99999
+  emoId: emo:1234!1
+  proId: pro:1234
+  licId: lic:1234
+  appId: app:app1
+  headset: *headset
+  time: 2016-12-15T03:37:58.064Z
+  status: active
+  markers: [moving, paused]
+  tags: [cycling]
+
+Profile:
+  _id: pro:1234.0
+  name: myApp1.0
+  emoId: emo:1234
+  appId: app:app1
+  status: active
+  command: [moveR, moveL, moveU, moveD]
+  ratings: [33, 55, 44, 11]
+
+EmoUser:
+  _id: emo:1234/1
+  name: Viet Tung
+  yob: 1999
+  hand: right 
+  gender: male
+  email: tung@viet.nam
+
+License:
+  _id: lic:1234
+  owner: emo:1234
+  emoId: emo:1234*
+  scope: EXTRA
+  appId: app:myApp*
+  amount: 30
+  topups: 30 
+  balance: 20
+  period: 30
+  devices: [ myDev1, myDev2 ]
+  maxDevs: 3
+  renewal: 2016-12-15T03:37:58.064Z

@@ -1,0 +1,71 @@
+<html>
+<head>
+<script src="./client.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://vega.github.io/vega/vega.js"></script>
+<script src="http://vega.github.io/vega-lite/vega-lite.js"></script>
+<script src="http://vega.github.io/vega-editor/vendor/vega-embed.js" charset="utf-8"></script>
+
+<style media="screen">
+	.vega-actions a { margin: 10px }
+</style>
+<script> 
+
+var events = ['sensors', 'metrics']
+var cortex = new Cortex({appId:'myApp1'})
+cortex.call('createSession', { events: events})
+	
+var mKeys = ['interest', 'valence', 'meditation', 'stress', 'focus']
+var specs = [
+	{	name: 'sensors',
+		data: [ ],
+		mark: 'area',
+		proc: evt => [evt],
+		width: 500,
+		padding: 5,
+		encoding: {
+			x: { field: 'offset', axis: { format: '%M:%S' }, type: "temporal" },
+			y: { field: 'bat', type: "quantitative" }
+		}
+	},
+	{ name: 'metrics',
+		data: [],
+		proc: (evt, res=[]) => {
+			mKeys.map(key => res.push({offset: evt.offset, val: evt[key.substring(0,3)], cat: key}))
+			return res
+		},
+		mark: 'line',
+		padding: 5,
+		width: 500,
+		encoding: {
+			x: { field: "offset", axis: { format: '%M:%S' }, type: "temporal" },
+			y: { field: "val", type: "quantitative" },
+			color: { field:"cat", type: "nominal"}
+		}
+	}
+]
+
+specs.map(spec => { 
+	vg.embed('#'+spec.name, { mode:'vega-lite', spec: spec}, (err, res) => {
+		if (err) return 
+		//var data = res.view.data('source') //spec.name)
+		console.log(res.view)
+		var data = res.view.data(spec.name+'_source')
+		cortex.on(spec.name, evt => {
+			evt.offset = parseInt(evt._id.match(/\+(\d+)/)[1])
+			console.log(evt)
+			data.remove(d => d.offset < (evt.offset - 10000))
+			data.insert(spec.proc(evt))
+			res.view.update()
+		})
+	})
+})
+
+</script>
+</head>
+<body>
+	<h1> Cortex Mock Test </h1>
+	<div id="sensors"></div>
+	<div id="metrics"></div>
+</body>
+</html>
