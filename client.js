@@ -86,8 +86,8 @@ function qSocket(wSocket) {
 
 //Polyfill QML and W3C WebSockets automatically
 function polySocket(socket) {
-	if (socket.sendMessage) return qSocket(socket)  //socket is QT WebSocket
-	if (socket.send) return wSocket(socket)  //socket is W3C WebSocket
+  if (socket.sendMessage) return qSocket(socket)  //socket is QT WebSocket
+  if (socket.send) return wSocket(socket)  //socket is W3C WebSocket
 }
 
 if (typeof module == 'object') module.exports = Cortex
