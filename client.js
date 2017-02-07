@@ -3,7 +3,8 @@ class Cortex {
 
   constructor (opts = {}, next) {
     Object.assign(this, { opts:opts, api:{}, _rpc:{}, _evt:{}, queue:[]})
-    this.sock = new WebSocket('ws://'+(opts.host||'localhost')+':'+(opts.port||8000))
+    if (ops.socket) this.sock = polySocket(opts.socket)
+    else this.sock = new WebSocket('ws://'+(opts.host||'localhost')+':'+(opts.port||8000))
     this.sock.onopen = () => this.queue.map(_ => this.sock.send(JSON.stringify(this.queue.shift())))
     if (opts.appId) this.auth(opts)
     this.sock.onmessage = msg => {
@@ -58,5 +59,35 @@ class Cortex {
   }
 }
 
-if (typeof module == 'object') module.exports = Cortex
+//Polyfill W3C WebSocket from QML WebSocket
+function wSocket(qSocket) {
+  qSocket.onMessageReceived = function(message) { if (this.onmessage) this.onmessage(message) }
+  qSocket.onStatusChanged   = function(status) {
+    if (status == 'error' && this.onerror) return this.onerror()
+    if (status == 'close' && this.onclose) return this.onclose()
+    if (status == 'open'  && this.onopen)  {
+      this.readyState = true 
+      return this.onopen()
+    } 
+  }
+  qSocket.send = qSocket.sendMessage
+  return qSocket
+}
 
+//Polyfill QML WebSocket from W3C WebSocket
+function qSocket(wSocket) {
+  wSocket.onmessage = function(message) { if (this.onMessageReceived) this.onMessageRecieved(message) }
+  wSocket.onerror   = function() { if (this.onStatusChanged) this.onStatusChanged('error') }
+  wSocket.onclose   = function() { if (this.onStatusChanged) this.onStatusChanged('close') }
+  wSocket.onopen    = function() { if (this.onStatusChanged) this.onStatusChanged('close') }
+  wSocket.sendMessage = w3socket.send
+  return wSocket
+}
+
+//Polyfill QML and W3C WebSockets automatically
+function polySocket(socket) {
+	if (socket.sendMessage) return qSocket(socket)  //socket is QT WebSocket
+	if (socket.send) return wSocket(socket)  //socket is W3C WebSocket
+}
+
+if (typeof module == 'object') module.exports = Cortex

@@ -17,6 +17,29 @@ To Test from Chrome..
 
 Additional API's defined below..
 
+### From QT/QML
+
+```
+import "client.js" as Cortex
+
+Rectangle {
+	width: 360
+	height: 360
+	WebSocket {
+		id: qSocket
+		url: 'wss://localhost:4080'
+	}
+	property var cortex: new Cortex({appId: 'myApp1', socket:qSocket})
+	Component.onCompleted: {
+		cortex.createSession()
+		cortex.on('eeg').then(eeg => /* do something with eeg event */)
+		cortex.on('log').then(log => /* do something with log event */)
+		cortex.on('sen').then(eeg => /* do something with sensor event */)
+	}
+}
+```
+
+
 ### RPC API: 
 
 See [RPCAPI](/emotiv/cortex/wiki/rpcapi.md) for more details
