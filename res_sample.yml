@@ -1,9 +1,11 @@
 Headset: &headset
-  _id: INSIGHT-1234
+  id: INSIGHT-1234
+  type: headset
   name: My INSIGHT
   status: connected
   version: INSIGHT.v1
-  sensors: [AF3, AF4, AF5, EE1, EE2]
+  sensors: &sensors
+    [AF3, AF4, AF5, EE1, EE2]
   settings: 
     eegRate: 33
     eegRes: 55
@@ -12,14 +14,20 @@ Headset: &headset
   firmware: v1.23
 
 Session:
-  _id: ses:1234.99999
-  emoId: emo:1234!1
-  proId: pro:1234
-  licId: lic:1234
-  appId: app:app1
+  id: ses:ABCD-1234-ABCD-1234
+  subject: sub:1234/1
+  profile: pro:1234/1
+  license: lic:1234
+  client: myEmotiv
   headset: *headset
-  time: 2016-12-15T03:37:58.064Z
+  connected: 2016-12-15T03:37:58.064Z
+  activated: 2016-12-15T03:37:58.064Z
   status: active
+  streams: 
+   - name: eeg, cols: *sensors
+   - name: con, cols: *sensors
+   - name: cog, cols: [int, med, foc, fru, exc, eng, lex]
+   - name: cog, cols: [int, med, foc, fru, exc, eng, lex]
   markers: [moving, paused]
   tags: [cycling]
 
@@ -32,24 +40,31 @@ Profile:
   command: [moveR, moveL, moveU, moveD]
   ratings: [33, 55, 44, 11]
 
-EmoUser:
-  _id: emo:1234/1
+Subject:
+  id: sub:1234/1
   name: Viet Tung
-  yob: 1999
+  year: 1999
   hand: right 
   gender: male
   email: tung@viet.nam
 
 License:
-  _id: lic:1234
-  owner: emo:1234
-  emoId: emo:1234*
-  scope: EXTRA
-  appId: app:myApp*
+  id: lic:1234
+  owner: emotiv1
+  scope: [eeg, pm]
   amount: 30
   topups: 30 
   balance: 20
   period: 30
   devices: [ myDev1, myDev2 ]
-  maxDevs: 3
+  maxDevice: 3
+  maxDebits: 10
   renewal: 2016-12-15T03:37:58.064Z
+
+Message: 
+  id: mes:ABCD-1234-ABCD-1234
+  time: 1488926601831
+  eeg: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  con: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  exp: [1, 0.341, 1, 0.444, 0.555, 1]
+  bat: [0.99, 0.44, 0.44]

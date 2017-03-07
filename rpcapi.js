@@ -7,28 +7,29 @@ var session = {}
 var rpc = {
 
   subscribe: (args, client) => {
-    verify(args, ['_auth', 'events'])
-    if (typeof args.events === 'string') args.events = args.events.split(',')
-    args.events.map(event => {
-      console.log('subscribing to :', event)
-      if (!clients[event]) clients[event] = {}
-      clients[event][args._auth] = client
+    verify(args, ['_auth', 'streams'])
+    if (typeof args.streams === 'string') args.streams = args.streams.split(',')
+    args.streams.map(stream => {
+      console.log('subscribing to :', stream)
+      if (!clients[stream]) clients[stream] = {}
+      clients[stream][args._auth] = client
+      res[stream] = models[stream].labels
     })
-    return 'ok'
+    return { 'ok'
   },
 
   unsubscribe: (args, client) => {
     verify(args, ['_auth', 'events'])
-    if (typeof args.events === 'string') args.events = args.events.split(',')
-    args.events.map(event => { delete clients[event][args._auth] })
+    if (typeof args.streams === 'string') args.streams = args.streams.split(',')
+    args.streams.map(stream => { delete clients[stream][args._auth] })
     return 'ok'
   },
 
   createSession: (args, client) => {
     verify(args, ['_auth'])
     session = models.genDoc('session', {id: 'ses:1234.' + new Date().getTime(), status: 'active'})
-    if (args.events) rpc.subscribe(args, client)
-    models.events.map(event => streams.push(setInterval(_ => notify(event.id), models.schema[event.id].interval)))
+    if (args.streams) rpc.subscribe(args, client)
+    models.streams.map(stream  => streams.push(setInterval(_ => notify(stream.id), models.schema[stream.id].interval)))
     return session
   },
 

@@ -6,7 +6,7 @@
     status: { type: string, notes: new status on the resource  }
     updated: { type: string, format: iso, notes: Timestamp the update occured  }
 
-- title: Metrics
+- title: Affect
   description: Cognitive Performance Metrics (Prime Licenses Only) 
   required: [_id]
   definitions: 
@@ -16,7 +16,14 @@
       minimum: 0
       maximum: 100
   properties: 
-    _id : { pattern: 'met:\w+\.\d+\+\d+', notes: 'met:{session id}+{offset in ms}' }
+    _id : { pattern: 'aff:\w+\.\d+\+\d+', notes: 'met:{session id}+{offset in ms}' }
+    type: 'affects'
+    data: []
+    sess:  
+    time:
+    head:
+    session:
+    headset:
     foc: *value
     eng: *value
     med: *value
