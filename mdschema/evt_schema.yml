@@ -1,0 +1,111 @@
+- title: Metrics
+  description: Cognitive Performance Metrics (Prime Licenses Only) 
+  required: [_id]
+  defintions: 
+    value: &value
+      type: number
+      multipleOf: 0.01
+      minimum: 0
+      maximum: 1
+  properties: 
+    _id : { pattern: met:\w+\.\d+\+\d+ }
+    foc: *value
+    eng: *value
+    med: *value
+    int: *value
+    val: *value
+
+- title: SysLogs
+  description: System Logs Messages from SDK 
+  required: [_id]
+  properties: 
+    _id: { pattern: 'sys:\w+\.\d+\+\d+', notes: Session ID + Offset }
+    code:  { type: number }
+    level: { enum: [ trace, debug, info, warn, error, fatal ] }
+    msg:   { type: string }
+
+- title: Markers
+  description: Event Markers Injected Into the EEG Stream
+  required: [_id]
+  properties: 
+    _id: { pattern: 'mar:\w+\.\d+\+\d+', notes: Session ID + Offset }
+    tags: { type: array, items: { type: string } }
+
+- title: Sensors
+  description: Sensor Status Events
+  required: [_id]
+  definitions:
+    values: &sensor
+      type: array
+      minItems: 5
+      items: *value
+  properties:
+    _id:  { pattern: sen:\w+\.\d+\+\d+ }
+    cq:  { type: array, items: *value, notes: Contact Quality }
+    bat: { type: integer, notes: Battery % Level }
+    sig: { type: integer, notes: Wireless Signal Strength }
+
+- title: PowBands
+  description: Sensor Status Events
+  required: [_id]
+  properties:
+    _id: { pattern: pow:\w+\.\d+\+\d+ }
+    alpha: *value
+    betaH: *value
+    betaL: *value
+    theta: *value
+    gamma: *value
+
+- title: EegData
+  description: Raw Eeg Readings (Prime or Extra Licenses only)
+  required: [_id]
+  properties: 
+    _id:  { pattern: eeg:\w+\.\d+\+\d+ }
+    raw: { type: array, items: *value  }
+ 
+- title: Facexps
+  description: Facial expression events
+  required: [_id]
+  properties:
+    _id: { pattern:  fac:\w+\.\d+\+\d+ }
+    uAct: { enum: [frown, suprise] }
+    uPow: *value 
+    lAct: { enum: [smile, laugh, clench] }
+    lPow: *value
+    eyes: { enum: [ blink, winkL, winkR, lookU, lookD, lookR, lookL ] }
+    
+- title: Command
+  description: Represents
+  required: [_id]
+  properties:
+    _id: { pattern: com:\w+\.\d+\+\d+ }
+    label: { type: string, notes: Name of detected command }
+    power: { type: number, notes: Action Power }
+ 
+- title: Motions
+  description: Represents
+  required: [_id]
+  properties:
+    _id: { pattern: mot:\w+\.\d+\+\d+ }
+    acc: { type: array, items: *value, notes: Accelerometer Readings }
+
+- title: Summary
+  description: Aggregated Performance Metric Summaries over 10 sec windows.
+  required: [_id]
+  definitions: 
+    stats: 
+      type: object
+      properties:
+        max: *value
+        min: *value
+        avg: *value
+        dev: *value
+  properties:
+    _id: { pattern: sum:\w+\.\d+\+\d+ }
+    foc: { $ref: stats }
+    int: { $ref: stats }   
+    eng: { $ref: stats }   
+    med: { $ref: stats }   
+    val: { $ref: stats }   
+    rel: { $ref: stats } 
+  
