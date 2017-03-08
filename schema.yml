@@ -1,10 +1,10 @@
-- title: headset
+- title: Headset
   description: An EEG Headset
   type: object
   properties: &headset
     id: { title: 'BT serial id', pattern: '(INSIGHT | EPOC)-\w{8}' }
-    type: 'headset'
-    label: {  title: 'user supplied headset name', type: string }
+    type: { pattern: 'headset' }
+    label: { title: 'user supplied headset name', type: string }
     iface: { enum: [BTLE, DONGLE] }
     dongle: { pattern: 'U\d{8}', notes: 'Dongle serial Id'}
     status: { enum: [ CONNECTED, DISCONNECTED, INUSE ] }
@@ -21,104 +21,109 @@
         memsRate: { enum: [0, 64, 128, 256 ] }
         memsRes:  { enum: [16, 14] }
 
-- title: session
+- title: Session
   description: | 
     Represents an continuous period of eeg related activity using an emotive headset.
 
   required: [id]
   properties: 
-  id: { pattern: 'ses:\w{4}.\d{8}', notes: 'Session GUID' }
-    type: session
+    id: { pattern: 'ses:\w{4}.\d{8}', notes: 'Session GUID' }
+    type: { pattern: 'session' }
     label: { type: string }
-    subject: { pattern: 'sub:\w{4}', notes: Emotive Subject Id }
+    subject: { pattern: 'sub:\w{4}', notes: Emotiv Subject Id }
     license: { pattern: 'lic:\w{8}', notes: License used to create session }
     profile: { pattern: 'pro:\w{8}', notes: Profile used for commands / facials detections }
-    headset: { $ref: headset }
-    client:  { pattern: 'app:\w{8}', notes: Client Application Identifier}
+    headset: { type: string }
+    client:  { pattern: '\w{8}', notes: Client Application Identifier}
     connected: { type: string, format: date-time,  notes: Session start time }
     activated: { type: string, format: date-time,  notes: Session activation time }
     completed: { type: string, format: date-time,  notes: Session completion time }
     duration:  { type: number, notes: Length in seconds }
     markers:   { type: array,  items: { type: string }, notes: Labels for Event Markers }
     streams:   
-      type: array,  
-      items: 
-        type: object
-        properties:
-          name: { type: string }
-          cols: { type: array, items: { type: string }, notes: Column Names }
-          vals: { type: array, items: { type: string }, notes: Enumeration Labels }
-          freq: { type: integer, notes: Update Frquency }
-    status:  { enum: [opened,active,error,paused,closed ], notes: 'error if session less than 1 minute'}
+      type: object
+      properties:
+        eeg: { type: array, items: { type: string }, notes: EEG MEssage Columns }
+        mot: { type: array, items: { type: string }, notes: Motion Message Columns }
+        con: { type: array, items: { type: string }, notes: Contact Message Columns }
+        com: { type: array, items: { type: string }, notes: Command Message Columns }
+        fac: { type: array, items: { type: string }, notes: Facial Expression Columns }
+        cog: { type: array, items: { type: string }, notes: Cognitiv Perf Metrics Columns }
+        bat: { type: array, items: { type: string }, notes: Battery Columns }
+    config: { type: object}
+    status: { enum: [opened,active,error,paused,closed ], notes: Error if session less than 1 minute }
     tags: { type: array, items: { type: string }, notes: Tags for this session }
     meta: { type: object }
-    logs: : 
+    logs: 
       type: array
       notes: Event Log file names for each 10 sec window 
-      items: { pattern: '(eeg|aff|mot|com|exp|con)\:\d{4}' }
+      items: { pattern: '(eeg|cog|mot|com|fac|con)\:\d{4}' }
    
-- title: profile
+- title: Profile
   description: |
     Training Profiles for Mental Commands and facial expressions.
   properties:
     id: { pattern: 'pro:\w{4}.\d', notes: '{emoId}/{index}' }
-    type : 'profile'
+    type : { pattern: profile }
     label: { type: string, notes: Profile name }
     subject: { pattern: 'sub:\w{8}', notes: The Emo user that created this profile }
-    commands: &action
+    actions: &action
        type: array
-       length: 6
+       length: 10
        items: 
-         type:  object, 
+         type:  object
          properties: 
-           label: { type: string} , 
-           status: { enum: training, completed, unknown], 
-           rating: { type: number, minimum: 0, maximum: 100, notes: Skill Rating }
-    facials: $action      
+           label : { type: string  }
+           index : { type: integer }
+           stream: { enum: [fac, com] } 
+           status: { enum: [training, completed, unknown] }
+           rating: &number { type: number, minimum: 0, maximum: 100, notes: Skill Rating }
+    facials: *action      
     tags: { type: array, items: { pattern: '\w{8}' } }
     logs: { type: array, items: { items: { pattern: '(com|fac)\:\w{4}' } } }
    
-- title: subject
+- title: Subject
   description: A Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
   properties:
-    id: { pattern: '\w{8}(/\w{8})?', notes: 'sub:{emoId}/{name}' }
-    emotiv_id: { type: string }
+    id: { pattern: '\w{8}(/\w{8})?', notes: 'sub:{emotivId}/{name}' }
+    type: { pattern: subject }
+    emotivId: { type: string }
     name: { type: string }
     tags: { type: array, items: { pattern: '\w{8}' } }
     meta: { type: object }
 
-- title: message
+- title: Message
   description: A Sample even Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
   properties:
     id: { pattern: 'mes:{sessionId}' }
-    type: 'message'
+    type: { pattern: message }
     time: { type: integer }
-    eeg: { type: { array, items: { type: numeric } }, notes: EEG Sensors }
-    cog: { type: { array, items: { type: numeric } }, notes: Cognitive Performance Metrics }
-    com: { type: { array, items: { type: numeric } }, notes: Mental Commands }
-    con: { type: { array, items: { type: numeric } }, notes: Contact Quality }
-    sig: { type: { array, items: { type: numeric } }, notes: Signal Strength }
-    bat: { type: { array, items: { type: numeric } }, notes: Signal Strength }
-    gps: { type: { array, items: { type: numeric } }, notes: GPS Location }
-    mot: { type: { array, items: { type: numeric } }, notes: Motion Sensors }
-    fac: { type: { array, items: { type: numeric } }, notes: Facial Expressions }
+    eeg: { type: array, items: *number, notes: EEG Sensors }
+    cog: { type: array, items: *number, notes: Cognitive Performance Metrics }
+    com: { type: array, items: *number, notes: Mental Commands }
+    con: { type: array, items: *number, notes: Contact Quality }
+    sig: { type: array, items: *number, notes: Signal Strength }
+    bat: { type: array, items: *number, notes: Signal Strength }
+    gps: { type: array, items: *number, notes: GPS Location }
+    mot: { type: array, items: *number, notes: Motion Sensors }
+    fac: { type: array, items: *number, notes: Facial Expressions }
 
-- title: license
+- title: License
   description: |
     A License to use cortex / sdk.
   type: object
   properties:
     id: { pattern: 'lic:\w{8}', notes: 'License key' }
-    type: 'license'
-    label : { notes: 'Optional User defined license name', type: string }
-    scope  : { type: array, items: { enum: [pm, eeg, ] }
+    #type: 'license'
+    label :  { notes: 'Optional User defined license name', type: string }
+    scope  : { type: array, items: { enum: [pm, eeg, ] } }
     owner  : { notes: License Owner EmoID, pattern: 'emo:\w+' }
     clients: { type: array, items: { type: string},  notes: If defined client must be a member of this set }
     userIds: { type: array, items: { type: string},  notes: If defined userId must be a member of this set }
     secret : { type: string, notes: Optional Secret that may be used to sign auth requests as SHA256 HMAC }
     balance: { type: integer, notes: Available Session Balance }
-    maxDevices : { type: integer, notes: Maximum Devices allowed - default is amount / 10 ) }
-    dailyLimit : { type: integer, default: 10, notes: Maximum Debit per Device per Day  }
+    maxDevices: { type: integer, notes: Maximum Devices allowed - default is amount / 10 ) }
+    dailyDebit: { type: integer, default: 10, notes: Maximum Debit per Device per Day  }
     devices : { type: array, items: string,  title: Current Devices Using License }
     amounts : { type: integer, notes: Initial balance purchased with subscription  } 
     topups : { type: integer, title:  Additonal topup sessions, (Maximum Session balance to roll over to next billing period }

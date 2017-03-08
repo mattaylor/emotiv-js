@@ -15,7 +15,7 @@ var rpc = {
       clients[stream][args._auth] = client
       res[stream] = models[stream].labels
     })
-    return { 'ok'
+    return 'ok'
   },
 
   unsubscribe: (args, client) => {

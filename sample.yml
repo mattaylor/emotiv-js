@@ -4,8 +4,7 @@ Headset: &headset
   name: My INSIGHT
   status: connected
   version: INSIGHT.v1
-  sensors: &sensors
-    [AF3, AF4, AF5, EE1, EE2]
+  sensors: &sensors [AF3, AF4, AF5, EE1, EE2]
   settings: 
     eegRate: 33
     eegRes: 55
@@ -19,27 +18,34 @@ Session:
   profile: pro:1234/1
   license: lic:1234
   client: myEmotiv
-  headset: *headset
+  headset: INSIGHT-1234
   connected: 2016-12-15T03:37:58.064Z
   activated: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   - name: eeg, cols: *sensors
-   - name: con, cols: *sensors
-   - name: cog, cols: [int, med, foc, fru, exc, eng, lex]
-   - name: cog, cols: [int, med, foc, fru, exc, eng, lex]
+   eeg: *sensors 
+   con: *sensors
+   cog: [int, med, foc, fru, exc, eng, lex]
+   bat: [headset, device]
+   pow: [alpha, beta, gamma, thetaH, thetaL]
+   fac: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ]
+   gps: [lat, lon]
   markers: [moving, paused]
   tags: [cycling]
 
 Profile:
-  _id: pro:1234.0
+  id: pro:1234.0
   name: myApp1.0
-  emoId: emo:1234
-  appId: app:app1
+  owner: 234
+  subject: emotiv1/subject1
   status: active
-  command: [moveR, moveL, moveU, moveD]
-  ratings: [33, 55, 44, 11]
-
+  actions: 
+   - { label: 'moveD', index: 0, stream: com, status: 'completed', rating: 0.77 }
+   - { label: 'moveU', index: 1, stream: com, status: 'completed', rating: 0.57 }
+   - { label: 'moveL', index: 2, stream: com, status: 'completed', rating: 0.57 }
+   - { label: 'wink', status: 'completed', rating: 0.77 }
+   - { label: 'frown', status: 'unknown', rating: 0.57 }
+ 
 Subject:
   id: sub:1234/1
   name: Viet Tung

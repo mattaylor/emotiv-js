@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var coffee = require('coffee-script/register');
+require(path.resolve(__dirname, '../mdschema.coffee')).startCLI();

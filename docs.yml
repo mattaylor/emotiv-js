@@ -1,0 +1,4 @@
+name: Cortex API Models 
+schemas: 
+ - src: ./schema.yml   
+   example: ./sample.yml
