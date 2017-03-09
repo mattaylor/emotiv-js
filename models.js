@@ -1,12 +1,11 @@
-var fs = require('fs')
-var jsf = require('json-schema-faker')
+var fs =   require('fs')
+var jsf =  require('json-schema-faker')
 var yaml = require('js-yaml')
+var req =  require('require-yml')
 
-var load = (file) => yaml.safeLoad(fs.readFileSync(file))
+var models = req('./schema.yml')
 
-var events = load('./evt_schema.yml')
-var models = load('./res_schema.yml')
-var schema = {}
+console.log(models)
 
 var fixit = s => {
   s.required = Object.keys(s.properties)
@@ -17,34 +16,26 @@ var fixit = s => {
   return s
 }
 
-events.map(s => schema[s.title.toLowerCase()] = fixit(s))
-models.map(s => schema[s.title.toLowerCase()] = fixit(s))
-console.log(schema)
-
-schema.auth = {
-  required: ['_auth', 'scope', 'debit', 'emoId', 'expires'],
-  properties: {
-    _auth: { pattern: '[A-Za-z0-9]{10}' },
-    emoId: { pattern: 'emo:[A-Za-z0-9]{10}' },
-    debit: { type: 'integer', minimum: 0, maximum: 100 },
-    scope: { enum: ['basic', 'extra', 'prime'] },
-    expires: { type: 'string', format: 'iso' }
-  }
-}
-
+var schema = {}
 var sample = {}
 
+models.map(s => schema[s.title.toLowerCase()] = fixit(s))
+
+console.log(schema)
+
+
 jsf.format('iso', (gen, schema) => new Date().toISOString())
-jsf.format('emo', (gen, schema) => 'emo:1234')
+jsf.format('sub', (gen, schema) => 'sub:1234')
 jsf.format('ses', (gen, schema) => 'ses:1234.' + new Date().getTime())
+jsf.format('word',(gen, schema) => 'ses:1234.' + new Date().getTime())
 
 Object.keys(schema).forEach(type => { sample[type] = jsf(schema[type], schema) })
+//var sample = jsf(schema.profile)
 
 console.log(sample)
 
 module.exports = {
   schema: schema,
-  events: events,
   sample: sample,
   genDoc: (type, defs = {}) => Object.assign(jsf(schema[type], schema), defs),
   dbList: (type, opts = { length: 10 }) => {
