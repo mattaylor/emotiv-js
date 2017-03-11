@@ -23,15 +23,15 @@ Session:
   stopped: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   eegData: { cols: *sensors }
-   contact: { cols: *sensors }
-   cogPerf: { cols: [int, med, foc, fru, exc, eng, lex] }
-   headset: { cols: [battery, signal] }
-   bandPow: { cols: [alpha, beta, gamma, thetaH, thetaL] }
-   facExps: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
-   latlong: { cols: [lat, lon] }
-   motions: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
-   profile: { cols: [action, status] }
+   eegs: { cols: *sensors, spec: [uint] }
+   cont: { cols: *sensors, spec: [enum] }
+   perf: { cols: [int, med, foc, fru, exc, eng, lex] }
+   head: { cols: [battery, signal], spec: [pct, enum, enum] }
+   band: { cols: [alpha, beta, gamma, thetaH, thetaL] }
+   face: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
+   loca: { cols: [lat, lon] }
+   gyro: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
+   prof: { cols: [action, status] }
 
 Profile:
   id: 1234.0
@@ -70,7 +70,7 @@ License:
 Message: 
   id: ABCD-1234-ABCD-1234
   time: 1488926601831
-  eegData: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  contact: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  faceExp: [1, 0.341, 1, 0.444, 0.555, 1]
-  headset: [0.99, 0.44, 0.44]
+  eegs: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  cont: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  face: [1, 0.341, 1, 0.444, 0.555, 1]
+  head: [0.99, 0.44, 0.44]

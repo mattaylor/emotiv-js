@@ -55,16 +55,15 @@ Param   | Required | Description
 --------|----------|-------------
 id      | Yes      | Session Id
 time    | Yes      | Message Timestamp  
-profile | No       | Profile Training Messages (eg training started, completed)
-headset | No       | Headset Update Messages (eg connection status, battery and signal strength)
-faceExp | No       | Facial Expression Detection Messages 
-command | No       | Mental Command Detection Messages 
-session | No       | Session Update Messages (eg changes to status, headset or profile)
-cogPerf | No       | Session Update Messages (eg changes to status, headset or profile)
-subject | No       | Subject Update Messages (eg changes to subject properties )
-eegData | No       | Raw EEG Samples
-motions | No       | Subject Update Messages (eg changes to subject properties )
-contact | No       | Contact Quality  Measures
+prof | No       | Profile Training Messages (eg training started, completed)
+head | No       | Headset Update Messages (eg connection status, battery and signal strength)
+face | No       | Facial Expression Detection Messages 
+comm | No       | Mental Command Detection Messages 
+sess | No       | Session Update Messages (eg changes to status, headset or profile)
+perf | No       | Cognive Performance Metrics 
+eegs | No       | Raw EEG Samples
+gyro | No       | Gyroscope Motion Samples
+cont | No       | Contact Quality  Measures
 
 __EXAMPLES:__
 
@@ -93,15 +92,15 @@ _RPC Notify without Response:_
 
 _EEG Data Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eegData:[100, 200, 300, 400 ] }
+<< { id: 'abcd-1234', time: 1489191278895, eegs:[100, 200, 300, 400 ] }
 ```
 _Cognitive Performance Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, cogPerf:[100, 200, 300, 400 ] }
+<< { id: 'abcd-1234', time: 1489191278895, cogs:[100, 200, 300, 400 ] }
 ```
 _Combined Notifications:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eegData:[100, 200, 300, 400, 444 ], contact:[99, 55,  22, 44, 44] }
+<< { id: 'abcd-1234', time: 1489191278895, eegs:[100, 200, 300, 400, 444 ], contact:[99, 55,  22, 44, 44] }
 ```
 
 ---
@@ -238,15 +237,15 @@ __EXAMPLES:__
       , headset: 'INSIGHT-1234'
       , markers: []
       , streams:
-        { contact: { cols: ['ALL',  'AF1', 'AF2'], freq: 128, min:0, max:8000 } ] }
-        , bandPow: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
-        , eegData: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
-        , cogPerf: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'LEX'] }
-        , command: { cols: ['Push', 'Push', 'MoveU','MoveD', 'MoveR', 'MoveL'] }
-        , profile: { cols: ['Command', 'Status'], enums:['started', 'stopped'] }
-        , headset: { cols: ['battery', 'signal', 'contact']}
-        , motions: { cols: ['gyroX', 'gyroY', 'gyroZ'] }
-        , faceExp: { cols: ['Frown', 'Clench','Smile', 'Surprise', 'Laugh', 'Blink', 'Wink_RL', 'look_RL', 'look_UD', 'Smirk_RL'] }
+        { cont: { cols: ['ALL',  'AF1', 'AF2'], freq: 128, min:0, max:8000 } ] }
+        , band: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
+        , eegs: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
+        , perf: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'LEX'] }
+        , comm: { cols: ['Push', 'Push', 'MoveU','MoveD', 'MoveR', 'MoveL'] }
+        , prof: { cols: ['Command', 'Status'], enums:['started', 'stopped'] }
+        , head: { cols: ['battery', 'signal', 'contact']}
+        , gyro: { cols: ['gyroX', 'gyroY', 'gyroZ'] }
+        , face: { cols: ['Frown', 'Clench','Smile', 'Surprise', 'Laugh', 'Blink', 'Wink_RL', 'look_RL', 'look_UD', 'Smirk_RL'] }
       }
     }
 ```
@@ -274,7 +273,7 @@ __RESPONSE:__
 - should only return sessions where either session.shared is true or session.licId is auth licId
 - should only return sessions where emoId is substring of _auth licId 
 - Should fail if _auth token is invalid
-- Should return a list of matching session objects ([Object](models.md#Object))   
+- Should return a list of matching session objects ([Session](models.md#Session))   
 
 __EXAMPLES:__
 
@@ -311,7 +310,7 @@ __RESPONSE:__
 - When status = closed then no more events should be published for the session, and logs  should be saved.
 - When status = paused then No EEG  or EEG and Other EVENT logs should be saved in 10 sec chunks as attachments to session
 - When status = active then EEG streams should be published and saved to log file
-- Should return updated session object ([Object](models.md#Object))   
+- Should return updated session object ([Session](models.md#Session))   
 - Should subscribe to session stream of current session
 
 
@@ -362,7 +361,7 @@ __EXAMPLES:__
 >>  { id: 1, jsonrpc: '2.0', result: true }
 >>  { id: 1, jsonrpc: '2.0', error : { code: 123, text: 'eegData unavailable' }
 
->>  { session:'1234', time: 8888888, eegData:[0.001, 0.004, .. ]}
+>>  { id:'1234', time: 8888888, eegs:[0.001, 0.004, .. ]}
 ```
 ---
 ## Unsubscribe
@@ -518,7 +517,7 @@ __Mental Command Training__
 >>  { id: 1, jsonrpc: '2.0', result: 'ok' }
 ...
 
->>  { id: 'ses123', time: 1489191278895, profile:['moveR', 1, 0.5, 'complete'] } 
+>>  { id: 'ses123', time: 1489191278895, prof:['moveR', 1, 0.5, 'complete'] } 
 ```
 
 ---
@@ -541,14 +540,15 @@ __EXAMPLES:__
 
 ```javascript
 <<  { id: 1, jsonrpc: '2.0', method: 'createProfile', params: 
-      { commands: ['moveR'], name: 'myProfile' }
+      { commands: ['moveR'], label: 'myProfile' }
     }
 
 >>  { id: 1, jsonrpc: '2.0', result:
-      { _id: 'pro:1234.0'
+      { id: '1234.0'
       , ratings: [0]
+      , label: 'myProfile'
       , commands:[ 'moveL']
-      , emoId: 'emo:1234'
+      , subject: '1234'
       }
     }
 ```
@@ -575,8 +575,8 @@ __EXAMPLES:__
 <<  { id: 1, jsonrpc: '2.0', method: 'queryProfiles', params: {emoId: 'emo:1234}}
 
 >>  { id: 1, jsonrpc: '2.0', result: {
-          [ { _id: 'pro:1234.99999', emoId: 'emo:1234', status: 'active', ... } 
-        , { _id: 'pro:1234.88888', emoId: 'emo:1235', status: 'inactive', .. } 
+      [ { id: '1234.99999', subject: '1234', status: 'active', ... } 
+      , { id: '1234.88888', subject: '1235', status: 'inactive', .. } 
       ]
      }
 ```
@@ -606,10 +606,10 @@ __EXAMPLES:__
 
 ```javascript
 <<  { id: 1, jsonrpc: '2.0', method: 'updateProfile', params: 
-      { _id: 'pro:1234.99999', name: 'Mat1' }
+      { id: '1234.99999', name: 'Mat1' }
 
 >>  { id: 1, jsonrpc: '2.0', result: 
-      { _id: 'pro:1234.99999, name: 'Mat1', status: 'active' }
+      { id: '1234.99999', name: 'Mat1', status: 'active' }
     }
 ```
 ---
@@ -635,12 +635,12 @@ __RESPONSE:__
 __EXAMPLES:__
 
 ```javascript
-<<  { id: 1, jsonrpc: '2.0', method: 'createEmoUser', params: 
-      { _auth: 'my_authToken', _id:'emo:1234/sub1', sex:'male', hand:'right', year:'1990', name:'subject1' } 
+<<  { id: 1, jsonrpc: '2.0', method: 'createSubject', _auth: 'myAuth1', params: 
+      { _auth: 'my_authToken', gender:'male', hand:'right', year:'1990', name:'subject1' } 
     }
 
 >>  { id: 1, jsonrpc: '2.0', result: 
-      { _id:'emo:1234/sub1', sex:'male', hand:'right', year:'1990', name:'subject1' } 
+      { id:'1234/1', gender:'male', hand:'right', year:'1990', name:'subject1' } 
    
 ```
 
@@ -668,8 +668,7 @@ __RESPONSE:__
 __EXAMPLES:__
 
 ```javascript
-<< { id: 1, jsonrpc: '2.0', method: 'querySubjects', params: 
-     { _auth: 'my_authToken' } 
+<< { id: 1, jsonrpc: '2.0', method: 'querySubjects', _auth: 'myAuth1', params: {}
    }
 
 >> { id: 1, jsonrpc: '2.0', result: 
@@ -709,11 +708,11 @@ __RESPONSE:__
 __EXAMPLES:__
 
 ```javascript
-<<  { id: 1, jsonrpc: '2.0', method: 'updateEmoUser', params: 
-      { _auth: 'my_authToken', _id: 'emo:1234/sub1', name:'First Subject' } 
+<<  { id: 1, jsonrpc: '2.0', method: 'updateEmoUser', _auth: 'myAuth1', params: 
+      { id: '1234/sub1', name:'First Subject' } 
     }
 
 >>  { id: 1, jsonrpc: '2.0', result: 
-      { _id:'emo:1234/sub1', sex:'male', hand:'right', year:'1990', name:'First Subject' } 
+      { id:'1234/sub1', sex:'male', hand:'right', year:'1990', name:'First Subject' } 
     }
 ```

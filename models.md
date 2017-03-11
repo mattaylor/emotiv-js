@@ -75,9 +75,9 @@ Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
 **open** | *Boolean* |  | 
 **cols** | *Array [undefined]* |  | 
-**vals** | *Array [undefined]* |  | 
-**freq** | *Integer* |  | 
-**unit** | *String* |  | 
+**spec** | *Array [undefined]* |  | 
+**freq** | *Integer* | Expected Update Frequency | 
+**unit** | *String* | Unit for unit values | 
 **enums** | *Array [string]* |  | 
 
 
@@ -103,7 +103,7 @@ Property | Type | Description | Example
 **started** | *String (date-time)* | Session start time | `"2016-12-15T03:37:58.064Z"`
 **stopped** | *String (date-time)* | Session stop  time | `"2016-12-15T03:37:58.064Z"`
 **markers** | *Array [string]* | Labels for Event Markers | `null`
-**streams** | *Object [Session.streams](#Session.streams)* |  | `{"eegData":{"cols":["AF3","AF4","AF5","EE1","EE2"]},"contact":{"cols":["AF3","AF4","AF5","EE1","EE2"]},"cogPerf":{"cols":["int","med","foc","fru","exc","eng","lex"]},"headset":{"cols":["battery","signal"]},"bandPow":{"cols":["alpha","beta","gamma","thetaH","thetaL"]},"facExps":{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"]},"latlong":{"cols":["lat","lon"]},"motions":{"cols":["gyroX","gyroY","gyroZ","accelX","accelY","accelZ"]},"profile":{"cols":["action","status"]}}`
+**streams** | *Object [Session.streams](#Session.streams)* |  | `{"eegs":{"cols":["AF3","AF4","AF5","EE1","EE2"],"spec":["uint"]},"cont":{"cols":["AF3","AF4","AF5","EE1","EE2"],"spec":["enum"]},"perf":{"cols":["int","med","foc","fru","exc","eng","lex"]},"head":{"cols":["battery","signal"],"spec":["pct","enum","enum"]},"band":{"cols":["alpha","beta","gamma","thetaH","thetaL"]},"face":{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"]},"loca":{"cols":["lat","lon"]},"gyro":{"cols":["gyroX","gyroY","gyroZ","accelX","accelY","accelZ"]},"prof":{"cols":["action","status"]}}`
 **tags** | *Array [string]* | Tags for this session | `null`
 **logs** | *Array [undefined]* | Event Log file names for each 10 sec window | `null`
 
@@ -120,25 +120,31 @@ __Example:__
   "stopped": "2016-12-15T03:37:58.064Z",
   "status": "active",
   "streams": {
-    "eegData": {
+    "eegs": {
       "cols": [
         "AF3",
         "AF4",
         "AF5",
         "EE1",
         "EE2"
+      ],
+      "spec": [
+        "uint"
       ]
     },
-    "contact": {
+    "cont": {
       "cols": [
         "AF3",
         "AF4",
         "AF5",
         "EE1",
         "EE2"
+      ],
+      "spec": [
+        "enum"
       ]
     },
-    "cogPerf": {
+    "perf": {
       "cols": [
         "int",
         "med",
@@ -149,13 +155,18 @@ __Example:__
         "lex"
       ]
     },
-    "headset": {
+    "head": {
       "cols": [
         "battery",
         "signal"
+      ],
+      "spec": [
+        "pct",
+        "enum",
+        "enum"
       ]
     },
-    "bandPow": {
+    "band": {
       "cols": [
         "alpha",
         "beta",
@@ -164,7 +175,7 @@ __Example:__
         "thetaL"
       ]
     },
-    "facExps": {
+    "face": {
       "cols": [
         "smile",
         "laugh",
@@ -178,13 +189,13 @@ __Example:__
         "wink_RL"
       ]
     },
-    "latlong": {
+    "loca": {
       "cols": [
         "lat",
         "lon"
       ]
     },
-    "motions": {
+    "gyro": {
       "cols": [
         "gyroX",
         "gyroY",
@@ -194,7 +205,7 @@ __Example:__
         "accelZ"
       ]
     },
-    "profile": {
+    "prof": {
       "cols": [
         "action",
         "status"
@@ -208,13 +219,15 @@ __Example:__
 
 Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
-**profile** | *string* |  | `{"cols":["action","status"]}`
-**cogPerf** | *string* |  | `{"cols":["int","med","foc","fru","exc","eng","lex"]}`
-**motions** | *string* |  | `{"cols":["gyroX","gyroY","gyroZ","accelX","accelY","accelZ"]}`
-**eegData** | *string* |  | `{"cols":["AF3","AF4","AF5","EE1","EE2"]}`
-**headset** | *string* |  | `{"cols":["battery","signal"]}`
-**subject** | *string* |  | `null`
-**contact** | *string* |  | `{"cols":["AF3","AF4","AF5","EE1","EE2"]}`
+**prof** | *string* |  | `{"cols":["action","status"]}`
+**perf** | *string* |  | `{"cols":["int","med","foc","fru","exc","eng","lex"]}`
+**gyro** | *string* |  | `{"cols":["gyroX","gyroY","gyroZ","accelX","accelY","accelZ"]}`
+**face** | *string* |  | `{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"]}`
+**comm** | *string* |  | `null`
+**eegs** | *string* |  | `{"cols":["AF3","AF4","AF5","EE1","EE2"],"spec":["uint"]}`
+**head** | *string* |  | `{"cols":["battery","signal"],"spec":["pct","enum","enum"]}`
+**cust** | *string* |  | `null`
+**cont** | *string* |  | `{"cols":["AF3","AF4","AF5","EE1","EE2"],"spec":["enum"]}`
 
 
 
@@ -323,10 +336,10 @@ Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
 **id** | *string* |  | `"ABCD-1234-ABCD-1234"`
 **time** | *String (date-time)* |  | `1488926601831`
-**eegData** | *Array [integer]* | EEG Data Samples | `[4000,1000,1000,1000,1000,1000,4000,500,1000,1000,500,1000,1000,5000,1000]`
+**eegData** | *Array [integer]* | EEG Data Samples | `null`
 **cogPerf** | *Array [integer]* | Performance Metrics | `null`
-**contact** | *Array [integer]* | Contact Quality | `[4000,1000,1000,1000,1000,1000,4000,500,1000,1000,500,1000,1000,5000,1000]`
-**headset** | *Array [integer]* | Headset Status | `[0.99,0.44,0.44]`
+**contact** | *Array [integer]* | Contact Quality | `null`
+**headset** | *Array [integer]* | Headset Status | `null`
 **profile** | *Array [undefined]* | Profile Trainging | `null`
 **motions** | *Array [integer]* | Motion sensors | `null`
 **bandPow** | *Array [integer]* | Band Powers | `null`
@@ -336,7 +349,7 @@ __Example:__
 {
   "id": "ABCD-1234-ABCD-1234",
   "time": 1488926601831,
-  "eegData": [
+  "eegs": [
     4000,
     1000,
     1000,
@@ -353,7 +366,7 @@ __Example:__
     5000,
     1000
   ],
-  "contact": [
+  "cont": [
     4000,
     1000,
     1000,
@@ -370,7 +383,7 @@ __Example:__
     5000,
     1000
   ],
-  "faceExp": [
+  "face": [
     1,
     0.341,
     1,
@@ -378,7 +391,7 @@ __Example:__
     0.555,
     1
   ],
-  "headset": [
+  "head": [
     0.99,
     0.44,
     0.44
