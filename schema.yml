@@ -3,7 +3,6 @@
   type: object
   properties: &headset
     id: { title: 'BT serial id', pattern: '(INSIGHT | EPOC)-\w{8}' }
-    type: { pattern: 'headset' }
     label: { title: 'user supplied headset name', faker: commerce.product }
     iface: { enum: [BTLE, DONGLE] }
     dongle: { pattern: 'U\d{8}', notes: 'Dongle serial Id'}
@@ -21,56 +20,46 @@
         memsRate: { enum: [0, 64, 128, 256 ] }
         memsRes:  { enum: [16, 14] }
 
+- title: Stream
+  description: | 
+    Configuration Details for a Notification Stream
+  type: object
+  properties: &stream
+    open: { type: boolean, default: true } 
+    cols: { type: array, minItems: 4, items: { faker: hacker.abbreviation } } 
+    vals: { type: array, items: { enum: [ enum, float, word, int] } }
+    freq: { type: integer, minimum: 1, maximum: 256 }
+    unit: { type: string, enum: [Hz, Mv, Pct] }
+    enums: { type: array,  items: { type: string, faker: random.word } } 
+
 - title: Session
   description: | 
     Represents an continuous period of eeg related activity using an emotive headset.
-
   required: [id]
-  definitions:
-    create:
-      properties:
-        headset: { type: string }
-    update:
-      properties:
-        status:  { enum: [opened,active,error,paused,closed ], notes: Error if session less than 1 minute }
-    stream:
-      properties: 
-        open: { type: boolean, default: true } 
-        cols: { type: array, items: { faker: hacker.abbreviation } } 
-        freq : { type: number, default: 100, faker: random.number }
-        unit : { type: string, enum: [Hz, Mv, Pct] }
-        enum : { type: array,  items: { faker: random.word } } 
-
   properties: 
-    id: { pattern: 'ses:\w{4}.\d{8}', notes: 'Session GUID', faker: random.uuid }
-    type: { pattern: 'session' }
-    label: { faker: random.word }
-    subject: { pattern: 'sub:\w{4}', notes: Emotiv Subject Id }
-    license: { pattern: 'lic:\w{8}', notes: License used to create session }
-    profile: { pattern: 'pro:\w{8}', notes: Profile used for commands / facials detections }
+    id: { pattern: 'w{4}.\d{8}', notes: 'Session GUID', faker: random.uuid }
+    label:   { faker: random.word }
+    status:  { enum: [ready, active, error, closed] }
+    subject: { pattern: '\w{4}', notes: Emotiv Subject Id }
+    license: { pattern: '\w{8}', notes: License used to create session }
+    profile: { pattern: '\w{8}', notes: Profile used for commands / facials detections }
     headset: { type: string, faker: random.uuid }
-    client:  { pattern: '\w{8}', faker: commerce.productName, notes: Client Application Identifier}
-    connected: { type: string, format: date-time,  faker: date.recent, notes: Session start time }
-    activated: { type: string, format: date-time,  faker: date.recent, notes: Session activation time }
-    completed: { type: string, format: date-time,  notes: date.recent, Session completion time }
-    duration:  { type: number, notes: Length in seconds, faker: finance.amount }
-    markers:   { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
+    client:  { pattern: '\w{8}', faker: commerce.productName, notes: Client Application Identifier }
+    started: { type: string, format: date-time,  faker: date.recent, notes: Session start time }
+    stopped: { type: string, format: date-time,  faker: date.recent, notes: Session stop  time }
+    markers: { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
     streams:   
       type: object
-      properties:
-        eeg: { $ref: 'stream' }
-        cog: { $ref: 'stream' }
-        con: { $ref: 'stream' }
-        com: { $ref: 'stream' }
-        bat: { $ref: 'stream' }
-        sig: { $ref: 'stream' }
-        mot: { $ref: 'stream' }
-        fac: { $ref: 'stream' }
-        loc: { $ref: 'stream' }
-        tag: { $ref: 'stream' }
-    status: { enum: [opened,active,error,paused,closed ], notes: Error if session less than 1 minute }
+      required: [eegData,cogPerf,motions,headset,profile]
+      properties: 
+        profile: *stream
+        cogPerf: *stream
+        motions: *stream
+        eegData: *stream
+        headset: *stream
+        subject: *stream
+        contact: *stream
     tags: { type: array, items: { type: string, faker: hacker.adjective }, notes: Tags for this session }
-    meta: { type: object }
     logs: 
       type: array
       notes: Event Log file names for each 10 sec window 
@@ -80,7 +69,7 @@
   description: |
     Training Profiles for Mental Commands and facial expressions.
   properties:
-    id: { pattern: 'pro:\w{8}.\d', notes: '{emotivId}/{index}' }
+    id: { pattern: '\w{8}.\d', notes: '{emotivId}/{index}' }
     type : { pattern: profile }
     label: { type: string, notes: Profile name, faker: name.jobType }
     subject: { pattern: 'sub:\w{8}', notes: The Subject ID the  created this profile }
@@ -91,7 +80,7 @@
           properties:
             label : { type: string, faker: hacker.verb  }
             index : { type: integer, minimum: 0, maximum: 6 }
-            status: { enum: [training, completed, unknown] }
+            status: { enum: [training, completed, untrained ] }
             rating: { type: integer, minimum: 0, maximum: 100, notes: Skill Rating }
     faceExp: 
       patternProperties: 
@@ -102,7 +91,7 @@
 - title: Subject
   description: A Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
   properties:
-    id: { pattern: 'sub:\w{8}(/\w{8})?', notes: 'sub:{emotivId}/{name}' }
+    id: { pattern: '\w{8}(/\w{8})?', notes: '{emotivId}/{name}' }
     type: { pattern: subject }
     owner: { type: string, notes: "Emotiv ID", faker: internet.userName }
     name: { type: string, faker: name.findName }
@@ -112,17 +101,22 @@
 - title: Message
   description: A Sample even Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
   properties:
-    id:   { pattern: '(eeg|cog|mot|com|fac|con):\w{8}' }
-    type: { pattern: '(eeg|cog|mot|com|fac|con)' }
-    time: { type: string, format: datetime, faker: date.recent }
-    data: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, notes: Data Samples }
+    id:   { pattern: '\w{8}', faker: random.uuid, notres: Session Id }
+    time: { type: string,  format: date-time, faker: date.recent }
+    eegData: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: EEG Data Samples }
+    cogPerf: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: Performance Metrics }
+    contact: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 8, notes: Contact Quality }
+    headset: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 2,  notes: Headset Status }
+    profile: { type: array, items: [ { type: integer, minimum: 0, maximum: 10 }, { enum: [started, completed ] } ], notes: Profile Trainging }
+    motions: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Motion sensors }
+    bandPow: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Band Powers }
     
 - title: License
   description: |
     A License to use cortex / sdk.
   type: object
   properties:
-    id: { pattern: 'lic:\w{8}', notes: 'License key' }
+    id: { pattern: '\w{8}', notes: 'License key' }
     type: { pattern: license }
     label :  { notes: 'Optional User defined license name', type: string }
     scope  : { type: array, items: { enum: [pm, eeg, test ] } }
@@ -132,24 +126,35 @@
     secret : { type: string, faker: hacker.phrase,  notes: Optional Secret that may be used to sign auth requests as SHA256 HMAC }
     balance: { type: integer, faker: finance.amount, notes: Available Session Balance }
     maxDevices: { type: integer, default: 3,  faker: finance.amount, notes: Maximum Devices allowed - default is amount / 10 ) }
-    dailyLimit: { type: integer, default: 10, faker: finance.amount, notes: Maximum Debit per Device per Day  }
+    dailyLimit: { type: integer, default: 10, faker: finance.amount, notes: Maximum Debit per User per Day  }
     expires: { type: string, format: date-time, faker: date.future, notes: Expiration Date of current billing period } 
     devices: { type: array, items: { faker: random.uuid },  title: Current Devices Using License }
     initial: { type: integer, faker: finance.amount,   notes: Initial balance purchased with subscription  } 
-    topups : { type: integer, faker: finance.amount, title:  Additonal topup sessions, (Maximum Session balance to roll over to next billing period }
+    topups : { type: integer, faker: finance.amount, title:  Additonal topup sessions, (Unused TopUps roll over to next billing period }
     status : { enum: [active, suspended, expired, pending ] }
     period : { type: integer, notes: Billing period in days }
 
-- title: Authorize
+- title: AuthRequest
   description: |
     Authorize Request
   type: object
   required: [license]
   properties: 
-    license:  { pattern: 'lic:[A-Za-z0-9]{10}' }
+    license:  { pattern: '[A-Za-z0-9]{10}' }
     username: { pattern: '[A-Za-z0-9]{10}', faker: internet.userName }
     password: { pattern: '[A-Za-z0-9]{10}', faker: internet.password }
     debit:    { type: integer, minimum: 0, maximum: 100 }
     client:   { type: string, faker: commerce.productName }
     timestamp: { type: string, format: date-time, faker: date.recent }
-    _hash:    { type: 'integer', minimum: 0, maximum: 100, faker: random.alphaNumeric }
+    _hash:    { type: 'string', chance: hash }
+
+
+- title: AuthResponse
+  description: |
+    Authorize Response
+  type: object
+  properties: 
+    _auth:   { type: string, length: 8, faker: internet.password }
+    scope:   { type: array, items: { enum: [eeg, pm, debug, cloud] } }
+    expires: { type: string, format: dat-time, faker: date.future } 
+    balance: { type: integer, minimum: 0, maximum: 100 }

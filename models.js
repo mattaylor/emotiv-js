@@ -8,6 +8,7 @@ var models = req('./schema.yml')
 console.log(models)
 
 var fixit = s => {
+  console.log(s)
   s.required = Object.keys(s.properties)
   if (s.definitions) schema = Object.assign(schema, s.definitions)
   if (!s.properties.type) s.properties.type = { pattern: s.title } 

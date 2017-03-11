@@ -13,41 +13,41 @@ Headset: &headset
   firmware: v1.23
 
 Session:
-  id: ses:ABCD-1234-ABCD-1234
-  subject: sub:1234/1
-  profile: pro:1234/1
-  license: lic:1234
+  id: ABCD-1234-ABCD-1234
+  subject: 1234/1
+  profile: 1234/1
+  license: 1234
   client: myEmotiv
   headset: INSIGHT-1234
-  connected: 2016-12-15T03:37:58.064Z
-  activated: 2016-12-15T03:37:58.064Z
+  started: 2016-12-15T03:37:58.064Z
+  stopped: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   eeg: *sensors 
-   con: *sensors
-   cog: [int, med, foc, fru, exc, eng, lex]
-   bat: [headset, device]
-   pow: [alpha, beta, gamma, thetaH, thetaL]
-   fac: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ]
-   gps: [lat, lon]
-  markers: [moving, paused]
-  tags: [cycling]
+   eegData: { cols: *sensors }
+   contact: { cols: *sensors }
+   cogPerf: { cols: [int, med, foc, fru, exc, eng, lex] }
+   headset: { cols: [battery, signal] }
+   bandPow: { cols: [alpha, beta, gamma, thetaH, thetaL] }
+   facExps: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
+   latlong: { cols: [lat, lon] }
+   motions: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
+   profile: { cols: [action, status] }
 
 Profile:
-  id: pro:1234.0
+  id: 1234.0
   name: myApp1.0
-  owner: 234
-  subject: emotiv1/subject1
-  status: active
-  actions: 
-   - { label: 'moveD', index: 0, stream: com, status: 'completed', rating: 0.77 }
-   - { label: 'moveU', index: 1, stream: com, status: 'completed', rating: 0.57 }
-   - { label: 'moveL', index: 2, stream: com, status: 'completed', rating: 0.57 }
-   - { label: 'wink', status: 'completed', rating: 0.77 }
+  owner: 1234
+  subject: 1234/1
+  command: 
+   - { label: 'moveD', status: 'completed', rating: 0.77 }
+   - { label: 'moveU', status: 'completed', rating: 0.57 }
+   - { label: 'moveL', status: 'completed', rating: 0.57 }
+  facExps:
+   - { label: 'wink',  status: 'completed', rating: 0.77 }
    - { label: 'frown', status: 'unknown', rating: 0.57 }
  
 Subject:
-  id: sub:1234/1
+  id: 1234/1
   name: Viet Tung
   year: 1999
   hand: right 
@@ -55,7 +55,7 @@ Subject:
   email: tung@viet.nam
 
 License:
-  id: lic:1234
+  id: 1234
   owner: emotiv1
   scope: [eeg, pm]
   amount: 30
@@ -63,14 +63,14 @@ License:
   balance: 20
   period: 30
   devices: [ myDev1, myDev2 ]
-  maxDevice: 3
-  maxDebits: 10
-  renewal: 2016-12-15T03:37:58.064Z
+  maxDevices: 3
+  dailyLimit: 10
+  expires: 2016-12-15T03:37:58.064Z
 
 Message: 
-  id: mes:ABCD-1234-ABCD-1234
+  id: ABCD-1234-ABCD-1234
   time: 1488926601831
-  eeg: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  con: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  exp: [1, 0.341, 1, 0.444, 0.555, 1]
-  bat: [0.99, 0.44, 0.44]
+  eegData: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  contact: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  faceExp: [1, 0.341, 1, 0.444, 0.555, 1]
+  headset: [0.99, 0.44, 0.44]

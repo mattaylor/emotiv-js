@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "docs": "coffee node_modules/mdschema/index.coffee -r schema.yml -o models.md"
+    "docs": "node bin/mdschema -r docs.yml -o models.md"
   },
   "dependencies": {
     "commander": "^2.9.0",

@@ -27,14 +27,14 @@ Rectangle {
 	height: 360
 	WebSocket {
 		id: qSocket
-		url: 'wss://localhost:4080'
+		url: 'wss://localhost:8000'
 	}
 	property var cortex: new Cortex({appId: 'myApp1', socket:qSocket})
 	Component.onCompleted: {
 		cortex.createSession()
-		cortex.on('eeg').then(eeg => /* do something with eeg event */)
-		cortex.on('log').then(log => /* do something with log event */)
-		cortex.on('sen').then(eeg => /* do something with sensor event */)
+		cortex.on('eegData').then(eeg => /* do something with eeg sample */)
+		cortex.on('cogPerf').then(log => /* do something with cognitv metrics */)
+		cortex.on('contact').then(eeg => /* do something with contact quality */)
 	}
 }
 ```
@@ -46,16 +46,14 @@ See [RPCAPI](/emotiv/cortex/wiki/rpcapi.md) for more details
 
 __Start Session:__
 ```
-<< { "id":1, "jsonrpc":"2.0", "method":"createSession", "params": { "events":["sensor"], "_auth": "abc" } }
+<< { "id":1, "jsonrpc":"2.0", "method":"createSession", "params": { "subscribe":["sensor"], "_auth": "abc" } }
 >> { "id":1, 
      "result":  
-     { "id"   : "ses:1234.9999"
-     , "emoId": "emo:1234"
-     , "type" : "session"
-     , "time" : "2016-12-13T03:13:13.841Z"
+     { "id"   : "1234.9999"
+     , "status" : "ready"
+     , "created" : "2016-12-13T03:13:13.841Z"
      , "sensors": [ "af3", "af4", "af5" ]
-     , "proId": "pro:1234", 
-     , "headset": { "name": "myInsight", "version": "INSIGHT", "id":"INSIGHT-1234", "firmware": "v1.2" } } }
+     , "headset": "Insight-1234" } } }
      }
    }
 ```
@@ -68,52 +66,47 @@ __Close Session:__
 
 __Subscribe:__
 ```
-<< { "id":1, "jsonrpc":"2.0", "method":"subscribe", "params": "events":["metrics","sensors"], "_auth": "abc" } }
+<< { "id":1, "jsonrpc":"2.0", "method":"subscribe", "params": "streams":["cogPerf","contact"], "_auth": "abc" } }
 >> { "id":1, "result":"ok" }
 ```
 
 __UnSubscribe:__
 ```
-<< { "id":1, "jsonrpc":"2.0", "method":"unsubscribe", "params": "events":["metrics","sensors"], "_auth": "abc" } }
+<< { "id":1, "jsonrpc":"2.0", "method":"unsubscribe", "params": "streams":["congPerf","eegData"], "_auth": "abc" } }
 >> { "id":1, "result":"ok" }
 ```
 
 __Authorize:__
 ```
-<< { "id":1, "jsonrpc":"2.0", "method":"authorize", "params": { "appId": "myApp1", "licId:"myLic1" } }
->> { "id":1, "result": {"_auth":"AWKU3flNae", "emoId":"1234", "debit""expires":}}
+<< { "id":1, "jsonrpc":"2.0", "method":"authorize", "params": { "license:"myLic1" } }
+>> { "id":1, "result": {"_auth":"AWKU3flNae", "expires":"1234", "balance":10}}
 ```
-
-### Events: 
-
+### Messages: 
 See [Event Models](/emotiv/cortex/wiki/events.md) for more details
 
-__Sensors:__
+__EegData:__
 ```
-{ "_id"  : "sen:1234.9999+10",
-, "imp" : [11,11,11,11,11],
-, "bat" : 88
-}
+{ "id"  : "ABCD-9999", "time" : 1489217636863 , "eegData": [11,11,11,11,11] }
 ```
 
-__Metrics:__
+__CogPerf:__
 ```
-{ "_id" : "met:1234.9999+10"
-, "foc":58
-, "int":2
-, "med":96
-}
+{ "id"  : "ABCD-9999", "time" : 1489217636863 , "cogPerf": [55,55,55,55,55,55] }
 ```
 
-__Facials:__
+__FacExps:__
 ```
-{ "_id":"fac:1234.9999+10"
-, "uAct": "frown"
-, "lAct": "smile"
-, "uPow": 77
-, "lPow": 44
-, "eyes": "lookR"
-}
+{ "id"  : "ABCD-9999", "time" : 1489217636863 , "eegData": [55,55,55,55,55,55] }
+```
+
+__Commands:__
+```
+{ "id"  : "ABCD-9999", "time" : 1489217636863 , "command": [55,55,55,55,55,55] }
+```
+
+__Profile:__
+```
+{ "id"  : "ABCD-9999", "time" : 1489217636863 , "profile": [55,55,55,55,55,55] }
 ```
 
 
@@ -122,19 +115,19 @@ __Facials:__
 
 __Basic Usage:__
 ```
-var client = new Cortex({ host: 'localhost', port:8080, appId:'myApp1', licId:'myLic1'})
+var cortex = new Cortex({ host: 'localhost', port:8000, client:'myApp1', license:'myLic1'})
 client.call('createSession'}).then(session => {/* do something */})
-client.on('sensors', event => { /* do something */} )
-client.on('facials', event => { /* do something */ })
+client.on('contact', event => { /* do something */} )
+client.on('facExps', event => { /* do something */ })
 client.on('motions', event => { /* do something */ })
-client.on('command', event => { /* do something */ })
+client.on('eegData', event => { /* do something */ })
 
 ```
 __Auto Discovery:__
 ```
-new Cortex({appId:'myApp', licId:'myLic'}, client => {
+new Cortex({client:'myApp1', license:'myLic'}, client => {
   client.api.createSession().then(session => {/* do something */})
-  client.on('sensors', event => { /* do something */ })
+  client.on('contact', event => { /* do something */ })
 })
 ```
 
