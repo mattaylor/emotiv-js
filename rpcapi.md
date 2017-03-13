@@ -55,15 +55,16 @@ Param   | Required | Description
 --------|----------|-------------
 id      | Yes      | Session Id
 time    | Yes      | Message Timestamp  
-prof | No       | Profile Training Messages (eg training started, completed)
-head | No       | Headset Update Messages (eg connection status, battery and signal strength)
-face | No       | Facial Expression Detection Messages 
-comm | No       | Mental Command Detection Messages 
-sess | No       | Session Update Messages (eg changes to status, headset or profile)
-perf | No       | Cognive Performance Metrics 
-eegs | No       | Raw EEG Samples
-gyro | No       | Gyroscope Motion Samples
-cont | No       | Contact Quality  Measures
+pro | No       | Profile Training Messages (eg training started, completed)
+dev | No       | Headset Device (eg connection status, battery and signal strength)
+fac | No       | Facial Expression Detection Messages 
+com | No       | Mental Command Detection Messages 
+ses | No       | Session Update Messages (eg changes to status, headset or profile)
+cog | No       | Cognive Performance Metrics 
+eeg | No       | Raw EEG Samples
+dev | No       | Raw EEG Samples
+mot | No       | Gyroscope Motion Samples
+con | No       | Contact Quality  Measures including battery and signal strength
 
 __EXAMPLES:__
 
@@ -92,15 +93,15 @@ _RPC Notify without Response:_
 
 _EEG Data Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eegs:[100, 200, 300, 400 ] }
+<< { id: 'abcd-1234', time: 1489191278895, eeg:[100, 200, 300, 400 ] }
 ```
 _Cognitive Performance Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, cogs:[100, 200, 300, 400 ] }
+<< { id: 'abcd-1234', time: 1489191278895, cog:[100, 200, 300, 400 ] }
 ```
 _Combined Notifications:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eegs:[100, 200, 300, 400, 444 ], contact:[99, 55,  22, 44, 44] }
+<< { id: 'abcd-1234', time: 1489191278895, eeg:[100, 200, 300, 400, 444 ], con:[99, 55,  22, 44, 44] }
 ```
 
 ---
@@ -237,15 +238,15 @@ __EXAMPLES:__
       , headset: 'INSIGHT-1234'
       , markers: []
       , streams:
-        { cont: { cols: ['ALL',  'AF1', 'AF2'], freq: 128, min:0, max:8000 } ] }
-        , band: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
-        , eegs: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
-        , perf: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'LEX'] }
-        , comm: { cols: ['Push', 'Push', 'MoveU','MoveD', 'MoveR', 'MoveL'] }
-        , prof: { cols: ['Command', 'Status'], enums:['started', 'stopped'] }
-        , head: { cols: ['battery', 'signal', 'contact']}
-        , gyro: { cols: ['gyroX', 'gyroY', 'gyroZ'] }
-        , face: { cols: ['Frown', 'Clench','Smile', 'Surprise', 'Laugh', 'Blink', 'Wink_RL', 'look_RL', 'look_UD', 'Smirk_RL'] }
+        { con: { cols: ['ALL',  'AF1', 'AF2'], freq: 128, min:0, max:8000 } ] }
+        , pow: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
+        , eeg: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
+        , per: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'LEX'] }
+        , com: { cols: ['Push', 'Push', 'MoveU','MoveD', 'MoveR', 'MoveL'] }
+        , pro: { cols: ['Command', 'Status'], enums:['started', 'stopped'] }
+        , dev: { cols: ['battery', 'signal', 'contact']}
+        , mot: { cols: ['gyroX', 'gyroY', 'gyroZ'] }
+        , fac: { cols: ['Frown', 'Clench','Smile', 'Surprise', 'Laugh', 'Blink', 'Wink_RL', 'look_RL', 'look_UD', 'Smirk_RL'] }
       }
     }
 ```
@@ -355,13 +356,13 @@ __EXAMPLES:__
 
 ```javascript
 <<  { id: 1, jsonrpc: '2.0', method: 'subscribe', _auth: 'myToken', params: 
-      { session: 1234, streams: ['eegData', 'metrics'] }
+      { session: 1234, streams: ['eeg', 'cog'] }
     }
 
 >>  { id: 1, jsonrpc: '2.0', result: true }
 >>  { id: 1, jsonrpc: '2.0', error : { code: 123, text: 'eegData unavailable' }
 
->>  { id:'1234', time: 8888888, eegs:[0.001, 0.004, .. ]}
+>>  { id:'1234', time: 8888888, eeg:[0.001, 0.004, .. ]}
 ```
 ---
 ## Unsubscribe

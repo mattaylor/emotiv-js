@@ -26,9 +26,9 @@ console.log(schema)
 
 
 jsf.format('iso', (gen, schema) => new Date().toISOString())
-jsf.format('sub', (gen, schema) => 'sub:1234')
-jsf.format('ses', (gen, schema) => 'ses:1234.' + new Date().getTime())
-jsf.format('word',(gen, schema) => 'ses:1234.' + new Date().getTime())
+jsf.format('sub', (gen, schema) => '1234')
+jsf.format('ses', (gen, schema) => '1234.' + new Date().getTime())
+jsf.format('word',(gen, schema) => '1234.' + new Date().getTime())
 
 Object.keys(schema).forEach(type => { sample[type] = jsf(schema[type], schema) })
 //var sample = jsf(schema.profile)

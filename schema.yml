@@ -50,17 +50,16 @@
     markers: { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
     streams:   
       type: object
-      required: [eegs,perf,gyro,head,prof,face,cont]
+      required: [eeg,cog,mot,dev,pro,fac,con,com]
       properties: 
-        prof: *stream
-        perf: *stream
-        gyro: *stream
-        face: *stream
-        comm: *stream
-        eegs: *stream
-        head: *stream
-        cust: *stream
-        cont: *stream
+        pro: *stream
+        cog: *stream
+        mot: *stream
+        fac: *stream
+        com: *stream
+        eeg: *stream
+        dev: *stream
+        con: *stream
     tags: { type: array, items: { type: string, faker: hacker.adjective }, notes: Tags for this session }
     logs: 
       type: array
@@ -103,15 +102,15 @@
 - title: Message
   description: A Sample even Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
   properties:
-    id:   { pattern: '\w{8}', faker: random.uuid, notres: Session Id }
+    sid:   { pattern: '\w{8}', faker: random.uuid, notres: Session/Subscription Id }
     time: { type: string,  format: date-time, faker: date.recent }
-    eegData: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: EEG Data Samples }
-    cogPerf: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: Performance Metrics }
-    contact: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 8, notes: Contact Quality }
-    headset: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 2,  notes: Headset Status }
-    profile: { type: array, items: [ { type: integer, minimum: 0, maximum: 10 }, { enum: [started, completed ] } ], notes: Profile Trainging }
-    motions: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Motion sensors }
-    bandPow: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Band Powers }
+    eeg: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: EEG Data Samples }
+    cog: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: Performance Metrics }
+    con: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 8, notes: Contact Quality }
+    dev: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 2,  notes: Device Status }
+    pro: { type: array, items: [ { type: integer, minimum: 0, maximum: 10 }, { enum: [started, completed ] } ], notes: Profile Trainging }
+    mot: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Motion sensors }
+    pow: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Band Powers }
     
 - title: License
   description: |

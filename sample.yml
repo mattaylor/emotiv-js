@@ -23,15 +23,15 @@ Session:
   stopped: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   eegs: { cols: *sensors, spec: [uint] }
-   cont: { cols: *sensors, spec: [enum] }
-   perf: { cols: [int, med, foc, fru, exc, eng, lex] }
-   head: { cols: [battery, signal], spec: [pct, enum, enum] }
-   band: { cols: [alpha, beta, gamma, thetaH, thetaL] }
-   face: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
-   loca: { cols: [lat, lon] }
-   gyro: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
-   prof: { cols: [action, status] }
+   eeg: { cols: *sensors, spec: [uint] }
+   con: { cols: *sensors, spec: [enum] }
+   cog: { cols: [int, med, foc, fru, exc, eng, lex] }
+   dev: { cols: [battery, signal], spec: [pct, enum, enum] }
+   pow: { cols: [alpha, beta, gamma, thetaH, thetaL] }
+   fac: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
+   gps: { cols: [lat, lon] }
+   mot: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
+   pro: { cols: [action, status] }
 
 Profile:
   id: 1234.0
@@ -68,9 +68,9 @@ License:
   expires: 2016-12-15T03:37:58.064Z
 
 Message: 
-  id: ABCD-1234-ABCD-1234
+  sid: ABCD-1234-ABCD-1234
   time: 1488926601831
-  eegs: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  cont: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  face: [1, 0.341, 1, 0.444, 0.555, 1]
-  head: [0.99, 0.44, 0.44]
+  eeg: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  con: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  fac: [1, 0.341, 1, 0.444, 0.555, 1]
+  dev: [0.99, 0.44, 0.44]

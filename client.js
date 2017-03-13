@@ -2,17 +2,16 @@
 class Cortex {
 
   constructor (opts = {}, next) {
-    Object.assign(this, { opts:opts, api:{}, _rpc:{}, _evt:{}, queue:[]})
+    Object.assign(this, { opts:opts, api:{}, _rpc:{}, _sub:{}, queue:[]})
     if (opts.socket) this.sock = polySocket(opts.socket)
     else this.sock = new WebSocket('ws://'+(opts.host||'localhost')+':'+(opts.port||8000))
     this.sock.onopen = () => this.queue.map(_ => this.sock.send(JSON.stringify(this.queue.shift())))
-    if (opts.appId) this.auth(opts)
+    if (opts.client) this.auth(opts)
     this.sock.onmessage = msg => {
       var data = JSON.parse(msg.data)
+      console.log('MESSAGE:', data)
       if (data.methods) return this.init(data.methods, next)
-      var type = (data.type || data._id || data.id).substring(0, 3)
-      if (!data.jsonrpc) return this._evt[type] && this._evt[type](data)
-      console.log('RESPONSE:', data)
+      if (data.sid) return Object.keys(this._sub).map(key => data[key] && this._sub[key].map(cb => cb(data)))
       if (!this._rpc[data.id]) throw('Invalid Response: '+data)
       if (data.error && this._rpc[data.id].err) this._rpc[data.id].err(data.error)
       else this._rpc[data.id].res(data.result, data.error)
@@ -22,7 +21,9 @@ class Cortex {
 
   /* Send authorization request and set this.creds as a promise to resolve to tokens  */
   auth (args = this.opts) {
-    return this.creds = this.call('authorize', args).then(res => this.creds = res) 
+    console.log('auth:', args)
+    return this.call('authorize', args).then(res => this.creds = res) 
+    //return this.creds = this.call('authorize', args) 
    }
 
   /* Implement supported rpc api's from server discovery */
@@ -43,19 +44,20 @@ class Cortex {
   }
 
   /* set callbacks for event handlers and auto subscribe to service if necessary*/
-  on (event, cb) {
-    var evt = event.substring(0,3)
-    if (this.creds && !this._evt[evt]) this.call('subscribe', {events: [event]})
-    if (cb) this._evt[evt] = cb
-    else return new Promise(resolve => { this._evt[evt] = resolve })
+  on (stream, cb) {
+    var stream = stream.substring(0,3)
+    if (this.creds && !this._sub[stream]) this.call('subscribe', {streams: [stream]})
+    if (!this._sub[stream]) this._sub[stream] = []
+    if (cb) this._sub[stream].push(cb)
+    else return new Promise(resolve => { this._sub[stream].push(resolve) })
   }
 
   /* remove callbacks for event handlers and unsubscribe from service */
-  off (event) {
-    var evt = event.substring(0,3)
-    if (!this._evt[evt]) return
-    if (this.creds) this.call('unsubscribe', {events: [event]})
-    delete this._evt[evt]
+  off (stream) {
+    var stream = stream.substring(0,3)
+    if (!this._sub[stream]) return
+    if (this.creds) this.call('unsubscribe', {streams: [stream]})
+    delete this._sub[stream]
   }
 }
 

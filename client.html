@@ -11,9 +11,9 @@
 </style>
 <script> 
 
-var events = ['sensors', 'metrics']
-var cortex = new Cortex({appId:'myApp1'})
-cortex.call('createSession', { events: events})
+var events = ['perf', 'eegs', 'band', 'head']
+var cortex = new Cortex({client:'myApp1'})
+cortex.call('createSession', { subscribe: events})
 	
 var mKeys = ['interest', 'valence', 'meditation', 'stress', 'focus']
 var specs = [
@@ -59,7 +59,7 @@ specs.map(spec => {
 </head>
 <body>
 	<h1> Cortex Mock Test </h1>
-	<div id="sensors"></div>
-	<div id="metrics"></div>
+	<div id="contact"></div>
+	<div id="eegData"></div>
 </body>
 </html>
