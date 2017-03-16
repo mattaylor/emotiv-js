@@ -93,7 +93,7 @@ _RPC Notify without Response:_
 
 _EEG Data Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eeg:[100, 200, 300, 400 ] }
+<< { id: 'abcd-1234', time: 1489191278895, eeg:[1000.00, 2000.00, 3000.00, 4000.00 ] }
 ```
 _Cognitive Performance Notificaton:_
 ```javascript
@@ -101,7 +101,7 @@ _Cognitive Performance Notificaton:_
 ```
 _Combined Notifications:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eeg:[100, 200, 300, 400, 444 ], con:[99, 55,  22, 44, 44] }
+<< { id: 'abcd-1234', time: 1489191278895, eeg:[1000, 2000, 3000, 4000, 4000], con:[99, 55,  22, 44, 44] }
 ```
 
 ---
@@ -239,9 +239,9 @@ __EXAMPLES:__
       , markers: []
       , streams:
         { con: { cols: ['ALL',  'AF1', 'AF2'], freq: 128, min:0, max:8000 } ] }
-        , pow: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
+        , pow: { cols: ['Alpha', 'BetaH', 'BetaL','Gamma', 'Theta']}
         , eeg: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
-        , per: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'LEX'] }
+        , cog: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'ENG', 'LEX'] }
         , com: { cols: ['Push', 'Push', 'MoveU','MoveD', 'MoveR', 'MoveL'] }
         , pro: { cols: ['Command', 'Status'], enums:['started', 'stopped'] }
         , dev: { cols: ['battery', 'signal', 'contact']}
@@ -252,7 +252,7 @@ __EXAMPLES:__
 ```
 
 ---
-## QuerySessions
+## querySession
 
 __REQUEST:__
 
@@ -271,7 +271,6 @@ stopped   | No | Minimum Stopped Time
 __RESPONSE:__
 
 - Should return a list of matching session records
-- should only return sessions where either session.shared is true or session.licId is auth licId
 - should only return sessions where emoId is substring of _auth licId 
 - Should fail if _auth token is invalid
 - Should return a list of matching session objects ([Session](models.md#Session))   
@@ -318,11 +317,10 @@ __RESPONSE:__
 __EXAMPLES:__
 
 ```javascript
-<<  { id: 1, jsonrpc: '2.0', method: 'updateSession', _auth: 'myToken', params: 
+<<  { id: 1, jsonrpc: '2.0', method: 'UpdateSession', _auth: 'myToken', params: 
       { _auth: 'myToken', status: 'closed' }
-
 >>  { id: 1, jsonrpc: '2.0', result: 
-      { id: '1234.99999', connected:"2017-03-07T20:10:0011Z", headset: 'INSIGHT-1234' }
+      { id: '1234.99999', started:"2017-03-07T20:10:0011Z", stopped:"2017-03-07T21:10:0011Z", status: "closed", headset: 'INSIGHT-1234' }
       }
     }
 ```
@@ -359,10 +357,16 @@ __EXAMPLES:__
       { session: 1234, streams: ['eeg', 'cog'] }
     }
 
->>  { id: 1, jsonrpc: '2.0', result: true }
+>>  { id: 1, jsonrpc: '2.0', result: 
+      { sid: 1234
+      , cog: { cols: ["int", "fru", "rel", "exc", "eng", "lex", "foc"]
+      , eeg: { cols: ["AF3","AF4", "T7","T8", "Pz"], freq: 128 } 
+      }
+    }
+
 >>  { id: 1, jsonrpc: '2.0', error : { code: 123, text: 'eegData unavailable' }
 
->>  { id:'1234', time: 8888888, eeg:[0.001, 0.004, .. ]}
+>>  { id:'1234', time: 8888888, cog: [100.01, 100.00, 14.33, 77.00, 89.00 ]}
 ```
 ---
 ## Unsubscribe
@@ -442,7 +446,7 @@ __RESPONSE:__
 __EXAMPLES:__
 
 ```javascript
-<<  { id: 1, jsonrpc: '2.0', method: 'queryHeadsets', params: { _id: 'INSIGHT*' } }
+<<  { id: 1, jsonrpc: '2.0', method: 'queryHeadsets', params: { id: 'INSIGHT*' } }
 
 >>  { id: 1, jsonrpc: '2.0', result: 
       [ { id: 'INSIGHT-1234', status: 'connected' }
@@ -577,7 +581,7 @@ __EXAMPLES:__
 
 >>  { id: 1, jsonrpc: '2.0', result: {
       [ { id: '1234.99999', subject: '1234', status: 'active', ... } 
-      , { id: '1234.88888', subject: '1235', status: 'inactive', .. } 
+      , { id: '1234.88888', subject: '1235', status: 'closed', .. } 
       ]
      }
 ```
@@ -701,15 +705,14 @@ __RESPONSE:__
 
 - Should fail if _auth token is not valid
 - Should fail if license scope is basic
-- Should fail if _id does not match existing emoUser record 
-- Should fail if _id is not substring of logged in user emoId +'/'
-- Should a single updated subject model ([Subject](models.md#Subject))   
+- Should fail if id does not match existing subject id for the current user 
+- Should a single updated subject object ([Subject](models.md#Subject))   
 
 
 __EXAMPLES:__
 
 ```javascript
-<<  { id: 1, jsonrpc: '2.0', method: 'updateEmoUser', _auth: 'myAuth1', params: 
+<<  { id: 1, jsonrpc: '2.0', method: 'updateSubject', _auth: 'myAuth1', params: 
       { id: '1234/sub1', name:'First Subject' } 
     }
 

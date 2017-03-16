@@ -4,7 +4,7 @@ Headset: &headset
   name: My INSIGHT
   status: connected
   version: INSIGHT.v1
-  sensors: &sensors [AF3, AF4, AF5, EE1, EE2]
+  sensors: &sensors [AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4]
   settings: 
     eegRate: 33
     eegRes: 55
@@ -23,15 +23,17 @@ Session:
   stopped: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   eeg: { cols: *sensors, spec: [uint] }
-   con: { cols: *sensors, spec: [enum] }
+   eeg: { cols: *sensors, spec: [float] }
+   con: { cols: *sensors, spec: [enum], enums: [none, poor, fair, good] }
    cog: { cols: [int, med, foc, fru, exc, eng, lex] }
-   dev: { cols: [battery, signal], spec: [pct, enum, enum] }
-   pow: { cols: [alpha, beta, gamma, thetaH, thetaL] }
+   dev: { cols: [battery, signal, ], spec: [enum], enums: [none, poor, fair, good ] }
+   pow: { cols: [alpha, betaL, betaL, gamma, delta] }
    fac: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
    gps: { cols: [lat, lon] }
    mot: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
-   pro: { cols: [action, status] }
+   log: { cols: [level, code, text], spec: [enum, uint, string], enums: [warn, error, debug] }
+   pro: { cols: [action, status, score] }
+   tag: { cols: [id, group, label ] }
 
 Profile:
   id: 1234.0
@@ -70,7 +72,7 @@ License:
 Message: 
   sid: ABCD-1234-ABCD-1234
   time: 1488926601831
-  eeg: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
-  con: [4000, 1000, 1000, 1000, 1000, 1000, 4000, 500, 1000, 1000, 500, 1000, 1000, 5000, 1000]
+  eeg: [4000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 500.00]
+  con: [4, 1, 1, 1, 0, 1]
   fac: [1, 0.341, 1, 0.444, 0.555, 1]
   dev: [0.99, 0.44, 0.44]

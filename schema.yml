@@ -30,11 +30,10 @@
     spec: { type: array, items: { enum: [ enum, unit, word, uint, pcts, time] } }
     freq: { type: integer, minimum: 1, maximum: 256, notes: 'Expected Update Frequency' }
     unit: { type: string, enum: [Hz, Mv, Pct], notes: 'Unit for unit values' }
-    enums: { type: array,  items: { type: string, faker: random.word }, 'Enumeration labels for enum cols' } 
-
+    enums: { type: array,  items: { type: string, faker: random.word }, 'String labels for enummerated values' } 
 - title: Session
   description: | 
-    Represents an continuous period of eeg related activity using an emotive headset.
+    Represents an continuous period of eeg related activity using an emotive headset
   required: [id]
   properties: 
     id: { pattern: 'w{4}.\d{8}', notes: 'Session GUID', faker: random.uuid }
@@ -50,7 +49,7 @@
     markers: { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
     streams:   
       type: object
-      required: [eeg,cog,mot,dev,pro,fac,con,com]
+      required: [eeg,cog,mot,dev,pro,fac,qua,com]
       properties: 
         pro: *stream
         cog: *stream
@@ -59,12 +58,12 @@
         com: *stream
         eeg: *stream
         dev: *stream
-        con: *stream
+        qua: *stream
     tags: { type: array, items: { type: string, faker: hacker.adjective }, notes: Tags for this session }
     logs: 
       type: array
       notes: Event Log file names for each 10 sec window 
-      items: { pattern: '(eegs|perf|gyro|comm|face|cont)\:\d{4}' }
+      items: { pattern: '(eeg|dev|mot|com|fac|qua)\:\d{4}' }
    
 - title: Profile
   description: |
@@ -73,7 +72,7 @@
     id: { pattern: '\w{8}.\d', notes: '{emotivId}/{index}' }
     type : { pattern: profile }
     label: { type: string, notes: Profile name, faker: name.jobType }
-    subject: { pattern: 'sub:\w{8}', notes: The Subject ID the  created this profile }
+    subject: { pattern: '\w{8}', notes: The Subject ID associated with this profile }
     command: 
       patternProperties:
         (push|pull|moveR|moveL|moveU|moveD|neutral): &action 
@@ -82,10 +81,10 @@
             label : { type: string, faker: hacker.verb  }
             index : { type: integer, minimum: 0, maximum: 6 }
             status: { enum: [training, completed, untrained ] }
-            rating: { type: integer, minimum: 0, maximum: 100, notes: Skill Rating }
+            rating: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01, notes: Skill Rating }
     faceExp: 
       patternProperties: 
-        (lookR|lookL|frown|smile|suprise|open|closed|neutral): *action 
+        (blink|smile|suprise|frown|open|closed|neutral): *action 
     tags: { type: array, items: { pattern: '\w{8}', faker: hacker.noun } }
     logs: { type: array, items: { items: { pattern: '(com|fac)\:\w{4}' } } }
    
@@ -100,17 +99,21 @@
     meta: { type: object }
 
 - title: Message
-  description: A Sample even Unique end user. 'Sub' users can be created on a parent emoId account by prefixing the sub user 'emoId' with the emoId of the parent followed by a '/'
+  description: A Message about an an opened session, sent to clients in response to subscription requests.
   properties:
-    sid:   { pattern: '\w{8}', faker: random.uuid, notres: Session/Subscription Id }
+    sid:  { pattern: '\w{8}', faker: random.uuid, notres: Session/Subscription Id }
     time: { type: string,  format: date-time, faker: date.recent }
-    eeg: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: EEG Data Samples }
-    cog: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 6, notes: Performance Metrics }
-    con: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 8, notes: Contact Quality }
-    dev: { type: array, items: { type: integer, minimum: 0, maximum: 1000, faker: finance.amount }, length: 2,  notes: Device Status }
-    pro: { type: array, items: [ { type: integer, minimum: 0, maximum: 10 }, { enum: [started, completed ] } ], notes: Profile Trainging }
-    mot: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Motion sensors }
-    pow: { type: array, items: { type: integer, minimum: 0, maximum: 100, faker: finance.amount }, length: 6,  notes: Band Powers }
+    eeg:  { type: array, items: { type: number, minimum: 0, maximum: 9000, multipleOf: 0.01, faker: finance.amount }, length: 6, notes: EEG Data Samples }
+    cog:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01,  faker: finance.amount }, length: 6, notes: Cogntive Metrics }
+    fac:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01,  faker: finance.amount }, length: 6, notes: Facial Expressions }
+    com:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01,  faker: finance.amount }, length: 6, notes: Mental Commands }
+    pow:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01, faker: finance.amount }, length: 6,  notes: Band Powers }
+    mot:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01, faker: finance.amount }, length: 6, notes: Motion sensors }
+    qua:  { type: array, items: { type: integer, minimum: 0, maximum: 4 }, length: 6, notes: Contact Quality }
+    dev:  { type: array, items: { type: integer, minimum: 0, maximum: 4 }, length: 4, notes: Device Status }
+    pro:  { type: array, items: [ { type: integer, minimum: 0, maximum: 10 }, { enum: [started, completed ] } ], notes: Profile Training }
+    tag:  { type: array, items: { type: integer, minimum: 0, maximum: 6, faker: finance.amount }, length: 6,  notes: Context Tags }
+    log:  { type: array, items: { type: integer, minimum: 100, maximum: 200, faker: finance.amount }, length: 6, notes: Log Messages }
     
 - title: License
   description: |
@@ -155,7 +158,8 @@
     Authorize Response
   type: object
   properties: 
-    _auth:   { type: string, length: 8, faker: internet.password }
+    _auth:   { type: string, length: 8, faker: internet.password } 
     scope:   { type: array, items: { enum: [eeg, pm, debug, cloud] } }
-    expires: { type: string, format: dat-time, faker: date.future } 
+    license: { type: string, faker: random.uuid }
+    expires: { type: string, format: date-time, faker: date.future } 
     balance: { type: integer, minimum: 0, maximum: 100 }
