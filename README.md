@@ -43,13 +43,13 @@ Rectangle {
 
 ### RPC API: 
 
-See [RPCAPI](/emotiv/cortex/wiki/rpcapi.md) for more details
+See [RPCAPI](/rpcapi.md) for more details
 
 __Start Session:__
 ```javascript
 << 	{ "id":1, "jsonrpc":"2.0", "method":"createSession", "params": { "subscribe":["qua"], "_auth": "abc" } }
->> 	{ "id":1, 
-			"result":  
+>> 	{ "id":1 
+		, "result":  
      	{ "id"   : "1234-abcd-abcd-abcd"
      	, "status" : "opened"
      	, "created" : "2016-12-13T03:13:13.841Z"
