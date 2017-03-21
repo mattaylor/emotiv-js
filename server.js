@@ -17,6 +17,7 @@ wss.on('connection', ws => {
   ws.on('message', (req, res = {}) => {
     try {
       req = JSON.parse(req)
+      if (req._auth && req.params)  req.params._auth = req._auth
       console.log('REQUEST:', req)
       res = { id: req.id, type: 'response', jsonrpc: req.jsonrpc || '2.0' }
       if (!rpc[req.method]) console.log('UnHandled:', req)

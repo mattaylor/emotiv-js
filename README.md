@@ -12,7 +12,7 @@ nodejs required
 To Test from Chrome..
 
 - Install A websocket extension like https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo?hl=en
-- Connect to 'ws://localhost:4080`
+- Connect to 'ws://localhost:8000`
 - To subscribe to all metrics and sensor streams, send `{ "id":1, "method":"events.subscribe", "params": {"topic":"metrics,sensors", "token": "abc" } }`
 
 Additional API's defined below..
@@ -29,12 +29,12 @@ Rectangle {
 		id: qSocket
 		url: 'wss://localhost:8000'
 	}
-	property var cortex: new Cortex({appId: 'myApp1', socket:qSocket})
+	property var cortex: new Cortex({client: 'myApp1', socket:qSocket})
 	Component.onCompleted: {
 		cortex.createSession()
-		cortex.on('eegs').then(eeg => /* do something with eeg sample */)
-		cortex.on('perf').then(log => /* do something with performance metrics */)
-		cortex.on('cont').then(eeg => /* do something with contact quality */)
+		cortex.on('eeg').then(eeg => /* do something with eeg sample */)
+		cortex.on('cog').then(cog => /* do something with performance metrics */)
+		cortex.on('qua').then(qua => /* do something with contact quality */)
 	}
 }
 ```
@@ -46,16 +46,27 @@ See [RPCAPI](/emotiv/cortex/wiki/rpcapi.md) for more details
 
 __Start Session:__
 ```javascript
-<< { "id":1, "jsonrpc":"2.0", "method":"createSession", "params": { "subscribe":["cont"], "_auth": "abc" } }
->> { "id":1, 
-     "result":  
-     { "id"   : "1234.9999"
-     , "status" : "opened"
-     , "created" : "2016-12-13T03:13:13.841Z"
-     , "sensors": [ "af3", "af4", "af5" ]
-     , "headset": "Insight-1234" } } }
-     }
-   }
+<< 	{ "id":1, "jsonrpc":"2.0", "method":"createSession", "params": { "subscribe":["qua"], "_auth": "abc" } }
+>> 	{ "id":1, 
+			"result":  
+     	{ "id"   : "1234-abcd-abcd-abcd"
+     	, "status" : "opened"
+     	, "created" : "2016-12-13T03:13:13.841Z"
+     	, "headset": "Insight-1234" 
+		 	, "streams": 
+   			{ "eeg": { "cols": ["AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"], "spec": ["float"], "freq": 128 }
+   			, "qua": { "cols": ["AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"], "spec": ["enum"],  "freq": 2 }
+   			, "cog": { "cols": ["int", "med", "foc", "fru", "exc", "eng", "lex"], freq: 2 }
+   			, "dev": { "cols": ["battery", "BT Signal"], "spec": ["enum"], "freq": 2, "enums": ["none", "poor", "fair", "good" ] }
+   			, "pow": { "cols": ["alpha", "betaL", "betaL", "gamma", "delta"], "freq": 8 }
+   			, "fac": { "cols": ["smile", "laugh", "clench", "frown", "suprise", "blink", "smirk_RL", "look_RL", "look_UD", "wink_RL" ], "freq": 2 }
+   			, "gps": { "cols": ["lat", "lon"] }
+   			, "ses": { "cols": ["status"] }
+   			, "mot": { "cols": ["gyroX", "gyroY",  "gyroZ"], "freq": 2 }
+   			, "pro": { "cols": ["action", "status", "score"] }
+		 		}
+     	}
+   	}
 ```
 
 __Close Session:__
@@ -66,13 +77,13 @@ __Close Session:__
 
 __Subscribe:__
 ```javascript
-<< { "id":1, "jsonrpc":"2.0", "method":"subscribe", "params": "streams":["perf","cont"], "_auth": "abc" } }
+<< { "id":1, "jsonrpc":"2.0", "method":"subscribe", "params": "streams":["cog","eeg"], "_auth": "abc" } }
 >> { "id":1, "result":"ok" }
 ```
 
 __UnSubscribe:__
 ```javascript
-<< { "id":1, "jsonrpc":"2.0", "method":"unsubscribe", "params": "streams":["perf","eegs"], "_auth": "abc" } }
+<< { "id":1, "jsonrpc":"2.0", "method":"unsubscribe", "params": "streams":["cog","eeg"], "_auth": "abc" } }
 >> { "id":1, "result":"ok" }
 ```
 
@@ -86,29 +97,38 @@ See [Event Models](/emotiv/cortex/wiki/events.md) for more details
 
 __EEG Samples:__
 ```javascript
-{ "id"  : "ABCD-9999", "time" : 1489217636863 , "eegs": [11,11,11,11,11] }
+{ "sid" : "ABCD-9999", "time" : 1489217636863 , "eeg": [111,111,111,111,111] }
 ```
 
 __Performance Metrics:__
 ```javascript
-{ "id"  : "ABCD-9999", "time" : 1489217636863 , "perf": [55,55,55,55,55,55] }
+{ "sid" : "ABCD-9999", "time" : 1489217636863 , "cog": [55,55,55,55,55,55] }
 ```
 
 __Facial Expressions:__
 ```javascript
-{ "id"  : "ABCD-9999", "time" : 1489217636863 , "face": [55,55,55,55,55,55] }
+{ "sid"  : "ABCD-9999", "time" : 1489217636863 , "fac": [1, 0.341, 1, 0.444, 0.555, 1] }
 ```
 
 __Mental Commands:__
 ```javascript
-{ "id"  : "ABCD-9999", "time" : 1489217636863 , "comm": [55,55,55,55,55,55] }
+{ "sid" : "ABCD-9999", "time" : 1489217636863 , "com": ["moveR", 0.98] }
 ```
 
 __Profile Training:__
 ```javascript
-{ "id"  : "ABCD-9999", "time" : 1489217636863 , "prof": [55,55,55,55,55,55] }
+{ "sid"  : "ABCD-9999", "time" : 1489217636863 , "pro": ["moveR","complete"] }
 ```
 
+__Contact Quality:__
+```javascript
+{ "sid"  : "ABCD-9999", "time" : 1489217636863 , "qua": [4, 1, 1, 1, 0, 1]
+```
+
+__Headset Device:__
+```javascript
+{ "sid"  : "ABCD-9999", "time" : 1489217636863 , "dev": [3, 4] }
+```
 
 ### JS Client API
 
@@ -117,16 +137,16 @@ __Basic Usage:__
 ```javascript
 var cortex = new Cortex({ host: 'localhost', port:8000, client:'myApp1', license:'myLic1'})
 client.call('createSession'}).then(session => {/* do something */})
-client.on('cont', event => { /* do something */} )
-client.on('face', event => { /* do something */ })
-client.on('gyro', event => { /* do something */ })
-client.on('eegs', event => { /* do something */ })
+client.on('qua', event => { /* do something with contact quality event*/} )
+client.on('fac', event => { /* do something with facial expression event*/ })
+client.on('mot', event => { /* do something with motion sensor event*/ })
+client.on('eeg', event => { /* do something with eeg data event*/ })
 
 ```
 __Auto Discovery:__
 ```javascript
 new Cortex({client:'myApp1', license:'myLic'}, client => {
   client.api.createSession().then(session => {/* do something */})
-  client.on('contact', event => { /* do something */ })
+  client.on('qua', event=> { /* do something */ })
 })
 ```
