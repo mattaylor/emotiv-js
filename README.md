@@ -13,7 +13,8 @@ To Test from Chrome..
 
 - Install A websocket extension like https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo?hl=en
 - Connect to 'ws://localhost:8000`
-- To subscribe to all metrics and sensor streams, send `{ "id":1, "method":"events.subscribe", "params": {"topic":"metrics,sensors", "token": "abc" } }`
+- To Authorise a client sent `{ "id":1, "method":"authorise", "params": {"license": $myLicenseKey }
+- To create a session and subscribe to eeg events `{ "id":1, "method":"createSession", "params": {"_auth":$auth_response_token, "streams":["eeg"] } }`
 
 Additional API's defined below..
 
