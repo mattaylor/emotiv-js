@@ -430,10 +430,10 @@ __EXAMPLES:__
 
 __REQUEST:__
 
-Params    | Required | Description 
-----------|----------|---------|------------
+Params    | Required | Description
+----------|----------|-------------
 id    | No (null) | Id of the headset to return
-status | No        |  
+status | No       | Headset status to filter on
 
 __RESPONSE:__
 
