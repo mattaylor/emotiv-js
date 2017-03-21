@@ -3,16 +3,15 @@ var models = require('./models')
 var clients = {}
 var streams = {}
 var session = {}
-var current = {}
+var latest  = {}
 var message = {}
 
 var rpc = {
 
-  subscribe: (args, client) => {
+  subscribe: (args={}, client) => {
     verify(args, ['_auth', 'streams'])
     if (typeof args.streams === 'string') args.streams = args.streams.split(',')
-    let sid = args.session || current 
-    console.log('current:', current)
+    let sid = args.session || latest 
     if (!session[sid] || session[sid].status == 'closed') throw('Invalid Session')
     if (!clients[sid]) clients[sid] = {}
     args.streams.map(stream => {
@@ -24,74 +23,90 @@ var rpc = {
     return { sid: args.session }
   },
 
-  unsubscribe: (args, client) => {
+  unsubscribe: (args={}, client) => {
     verify(args, ['_auth', 'streams'])
-    let sid = args.session || current
+    let sid = args.session || latest
     if (typeof args.streams === 'string') args.streams = args.streams.split(',')
     args.streams.map(stream => { delete clients[sid][stream][args._auth] })
     return 'ok'
   },
 
-  createSession: (args, client) => {
+  createSession: (args={}, client) => {
     verify(args, ['_auth'])
-    let sid = current = new Date().getTime()
-    session[sid] = models.genDoc('session', {id: sid, status: args.status || 'active'})
-    console.log(session[sid])
-    if (args.subscribe) rpc.subscribe({_auth:args._auth, session:sid, streams:args.subscribe}, client)
-    streams[sid] = Object.keys(session[sid].streams).map(stream  => setInterval(_ => notify(stream, sid), 1000))
-    //streams[sid] = args.subscribe .map(stream  => setInterval(_ => notify(stream, sid), 1000))
+    let sid = latest = new Date().getTime()
+    let ses = { id: sid,created: new Date().toISOString(),  status: args.status || 'active', streams: models.sample.Session.streams}
+    ses = models.genDoc('session', ses)
+    if (ses.status == 'active') ses.started =  ses.created
+    ses.stopped = null
+    session[sid] = ses
+    console.log(ses)
+    if (!args.subscribe) args.subscribe = ['ses'] 
+    else args.subscribe.push('ses')
+    rpc.subscribe({_auth:args._auth, session:sid, streams:args.subscribe}, client)
+    streams[sid] = []
+    Object.keys(ses.streams).map(stream  => {
+      if (ses.streams[stream].freq) streams[sid].push(setInterval(_ => notify(random(stream, sid)), 1000/ses.streams[stream].freq))
+    })
+    return ses
+  },
+
+  updateSession: (args={}, client) => {
+    verify(args, ['_auth'])
+    let sid = args.session || latest
+    if (!session[sid]) throw ('Invalid Session')
+    session[sid] = Object.assign(session[sid], args)
+    if (args.status) notify({sid:sid, ses:[args.status]})
+    if (session[sid].status ==  'closed') { 
+      session[sid].stopped =  new Date().toISOString()
+      delete clients[sid]
+      streams[sid].map(clearInterval)
+    }
     return session[sid]
   },
 
-  updateSession: (args, client) => {
-    verify(args, ['_auth'])
-    let sid = args.session || current
-    if (!session[sid]) throw ('Invalid Session')
-    session[sid] = Object.assign(session[sid], args)
-    if (session.status != 'closed') return  session
-    delete clients[sid]
-    streams[sid].map(clearInterval)
-  },
-
-  createMarker: (args, client) => verify(args, ['id', 'note', 'time']) ? 'ok' : null,
+  createMarker: (args={}, client) => verify(args, ['id', 'note', 'time']) ? 'ok' : null,
   authorize : (args, client) => verify(args, ['client']) ? models.genDoc('authresponse', args) : null,
   createSubject : (args, client) => verify(args, ['_auth']) ? models.genDoc('subject', args) : null,
   queryHeadsets : (args) => [ models.genDoc('headset') ],
-  querySessions : (args) => Object.values(sessions),
+  querySessions : (args) => Object.keys(session).map(sid => session[sid]),
   querySubjects : (args) => [ models.getDoc('subject') ],
   queryProfiles : (args) => [ models.getDoc('profile') ]
 }
 
-var notify = (stream, sid) => {
-  //if (!clients[sid][stream]) return
-  //if (!models.schema[stream]) return
-  if (!message[sid]) message[sid] = {}
-  //let next = { id: sid.replace(/^\w{3}/,stream), time: new Date().getTime(),  data: [] }
+var random = (stream, sid) => {
   let next = { sid: sid, time: new Date().getTime() }
+  if (!message[sid]) message[sid] = {}
   let last = message[sid][stream]
   next[stream] = [] 
   if (last) {
     next[stream] = last.data = last.data.map((val, i) => 
       val -= Math.round((Math.random() - 0.5)*50 + ((val - last.init[i]) * 0.01)))
   } else {
-    let  n = 15
+    let n  = session[sid].streams[stream].cols.length
     while(n--) next[stream].push(Math.round(Math.random() * 1000))
     message[sid][stream] = { data: next[stream], init: next[stream] }
   }
-  if (clients[sid] && clients[sid][stream]) Object.keys(clients[sid][stream]).map(token => {
-    try {
-      console.log(next)
-      clients[sid][stream][token].send(JSON.stringify(next))
-    } catch (err) {
-      console.log(err)
-      //delete clients[sid][stream][stream][token]
-    }
+  return next
+}
+
+var notify = (message) => {
+  if (!message.time) message.time =  new Date().getTime()
+  if (!message.sid) message.sid = latest
+  let sid = message.sid
+  if (clients[sid]) Object.keys(clients[sid]).map(stream => {
+    if (message[stream] && clients[sid][stream]) Object.keys(clients[sid][stream]).map(token => {
+      try {
+        clients[sid][stream][token].send(JSON.stringify(message))
+      } catch (err) {
+        console.log(err)
+      }
+    })
   })
 }
 
 var verify = (ob, keys) => {
   var err = []
-  keys.map(k => { if (!ob[k]) err.push('Missing ' + k) })
+  keys.map(k => { if  (!ob[k]) err.push('Missing ' + k) })
   if (err.length) throw err
   return true
 }

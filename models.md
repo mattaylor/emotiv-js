@@ -1,7 +1,7 @@
 ## __Cortex API Models__
 ---
-
 [TOC]
+
 ---
 
 
@@ -535,6 +535,35 @@ Property | Type | Description | Example
 **license** | *String* |  | 
 **expires** | *String (date-time)* |  | 
 **balance** | *Integer* |  | 
+
+
+
+---
+## Context
+
+Application Context for sessions
+
+
+
+
+Property | Type | Description | Example
+---- | ---- | ---- | ---- | ----
+**session** | *string* | Session GUID | 
+**license** | *String* | license used to create context | 
+**client** | *String* | The Client App that created this context | 
+**group** | *String* | Context group | 
+**label** | *String* | String label for this context | 
+**value** | *Integer* | Numeric value for this context | 
+**started** | *String (date-time)* |  | 
+**stopped** | *String (date-time)* |  | 
+**meta** | *Object [Context.meta](#Context.meta)* |  | 
+**docs** | *Array [string]* |  | 
+
+
+### Context.meta
+
+Property | Type | Description | Example
+---- | ---- | ---- | ---- | ----
 
 
 

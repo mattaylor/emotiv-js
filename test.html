@@ -46,6 +46,7 @@ var client = new Cortex({})
       it("should include session Id", () =>  client.on('eeg').then(_ =>  expect(_.sid).to.exist))
       it("should include eeg samples", () => client.on('eeg').then(_ =>  expect(_.eeg).to.exist))
     })
+    
     describe("FACIAL EXPRESSION  Messages", () => {
       it("should include time stamps", () => client.on('fac').then(_ =>  expect(_.time).to.exist))
       it("should include session Id", () =>  client.on('fac').then(_ =>  expect(_.sid).to.exist))

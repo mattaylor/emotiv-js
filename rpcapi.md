@@ -720,3 +720,47 @@ __EXAMPLES:__
       { id:'1234/sub1', sex:'male', hand:'right', year:'1990', name:'First Subject' } 
     }
 ```
+
+
+---
+## CreateContext
+
+Create Session Context To Represent Experiments or other temporal activities assicated with EEG sessions 
+about which insight and anlyatics may be derived.
+
+__REQUEST:__ 
+
+Params    | Required | Description 
+----------|----------|---------------
+_auth     |          | Access Token
+session   | No       | Session Id
+label     | No       | String Value
+group     | No       | Context Groupe
+value     | No       | Numeric Value
+tags      | No       | List of Tag
+tags      | No       | List of Tag
+docs      | No       | Links to associated documentation
+started   | No       | Timestamp 
+stopped   | No       | Timestamp 
+
+__RESPONSE:__
+
+- Should fail if _auth token is not valid
+- Should fail if session is not a valid session
+- Should fail if stopped < started 
+- Should fail if stopped < session.started
+- Should fail if started > session.stopped
+- Should return new Context Object ([Context](models.md#Context))   
+
+
+__EXAMPLES:__
+
+```javascript
+<<  { id: 1, jsonrpc: '2.0', method: 'createContext', _auth: 'myAuth1', params: 
+      { group: 'Experiment1/Question4', value: 1, started:"2017-03-07T20:10:0011Z" } 
+    }
+
+>>  { id: 1, jsonrpc: '2.0', result: 
+      { id: "context1", group: 'Experiment1/Question4', value: 1, client: 'com.emotiv.omniscience', started:"2017-03-07T20:10:0011Z" } 
+    }
+```

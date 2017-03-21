@@ -44,8 +44,8 @@
     profile: { pattern: '\w{8}', notes: Profile used for commands / facials detections }
     headset: { type: string, faker: random.uuid }
     client:  { pattern: '\w{8}', faker: commerce.productName, notes: Client Application Identifier }
-    started: { type: string, format: date-time,  faker: date.recent, notes: Session start time }
-    stopped: { type: string, format: date-time,  faker: date.recent, notes: Session stop  time }
+    started: { type: string, format: iso,  faker: date.recent, notes: Session start time }
+    stopped: { type: string, format: iso,  faker: date.recent, notes: Session stop  time }
     markers: { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
     streams:   
       type: object
@@ -102,7 +102,7 @@
   description: A Message about an an opened session, sent to clients in response to subscription requests.
   properties:
     sid:  { pattern: '\w{8}', faker: random.uuid, notres: Session/Subscription Id }
-    time: { type: string,  format: date-time, faker: date.recent }
+    time: { type: string,  format: iso, faker: date.recent }
     eeg:  { type: array, items: { type: number, minimum: 0, maximum: 9000, multipleOf: 0.01, faker: finance.amount }, length: 6, notes: EEG Data Samples }
     cog:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01,  faker: finance.amount }, length: 6, notes: Cogntive Metrics }
     fac:  { type: array, items: { type: number, minimum: 0, maximum: 100, multipleOf: 0.01,  faker: finance.amount }, length: 6, notes: Facial Expressions }
@@ -163,3 +163,20 @@
     license: { type: string, faker: random.uuid }
     expires: { type: string, format: date-time, faker: date.future } 
     balance: { type: integer, minimum: 0, maximum: 100 }
+
+- title: Context
+  description: |
+    Application Context for sessions
+  type: object
+  properties: 
+    session: { pattern: 'w{4}.\d{8}', notes: 'Session GUID', faker: random.uuid }
+    license: { type: string, faker: random.uuid, notes: license used to create context }
+    client : { type: string, notes: The Client App that created this context } 
+    group  : { type: string, minimum: 0, maximum: 100,  notes: Context group }
+    label  : { type: string, minimum: 0, maximum: 100,  notes: String label for this context }
+    value  : { type: integer, minimum: 0, maximum: 100, notes: Numeric value for this context }
+    started: { type: string, format: date-time, notest: context / activity start time }
+    stopped: { type: string, format: date-time, notest: context / activity stop time }
+    meta   : { type: object, minimum: 0, maximum: 100 }
+    docs   : { type: array, items: { type: string, format: uri }, notest: Additonal Resources for this context }
+

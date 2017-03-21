@@ -78,7 +78,7 @@ function wSocket(qSocket) {
 
 //Polyfill QML WebSocket from W3C WebSocket
 function qSocket(wSocket) {
-  wSocket.onmessage = function(message) { if (this.onMessageReceived) this.onMessageRecieved(message) }
+  wSocket.onmessage = function(message) { if (this.onMessageReceived) this.onMessageReceived(message) }
   wSocket.onerror   = function() { if (this.onStatusChanged) this.onStatusChanged('error') }
   wSocket.onclose   = function() { if (this.onStatusChanged) this.onStatusChanged('close') }
   wSocket.onopen    = function() { if (this.onStatusChanged) this.onStatusChanged('close') }

@@ -4,6 +4,7 @@ var yaml = require('js-yaml')
 var req =  require('require-yml')
 
 var models = req('./schema.yml')
+var sample = req('./sample.yml')
 
 console.log(models)
 
@@ -18,7 +19,7 @@ var fixit = s => {
 }
 
 var schema = {}
-var sample = {}
+//var sample = {}
 
 models.map(s => schema[s.title.toLowerCase()] = fixit(s))
 
@@ -30,7 +31,7 @@ jsf.format('sub', (gen, schema) => '1234')
 jsf.format('ses', (gen, schema) => '1234.' + new Date().getTime())
 jsf.format('word',(gen, schema) => '1234.' + new Date().getTime())
 
-Object.keys(schema).forEach(type => { sample[type] = jsf(schema[type], schema) })
+//Object.keys(schema).forEach(type => { sample[type] = jsf(schema[type], schema) })
 //var sample = jsf(schema.profile)
 
 console.log(sample)

@@ -23,14 +23,14 @@ Session:
   stopped: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   eeg: { cols: *sensors, spec: [float] }
-   con: { cols: *sensors, spec: [enum], enums: [none, poor, fair, good] }
-   cog: { cols: [int, med, foc, fru, exc, eng, lex] }
-   dev: { cols: [battery, signal, ], spec: [enum], enums: [none, poor, fair, good ] }
-   pow: { cols: [alpha, betaL, betaL, gamma, delta] }
-   fac: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ] }
+   eeg: { cols: *sensors, spec: [float], freq: 128 }
+   con: { cols: *sensors, spec: [enum], freq: 2, enums: [none, poor, fair, good] }
+   cog: { cols: [int, med, foc, fru, exc, eng, lex], freq: 2 }
+   dev: { cols: [battery, signal, ], spec: [enum], freq: 2, enums: [none, poor, fair, good ] }
+   pow: { cols: [alpha, betaL, betaL, gamma, delta], freq: 8 }
+   fac: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ], freq: 2 }
    gps: { cols: [lat, lon] }
-   mot: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ] }
+   mot: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ], freq: 2 }
    log: { cols: [level, code, text], spec: [enum, uint, string], enums: [warn, error, debug] }
    pro: { cols: [action, status, score] }
    tag: { cols: [id, group, label ] }
