@@ -22,8 +22,7 @@ class Cortex {
   /* Send authorization request and set this.creds as a promise to resolve to tokens  */
   auth (args = this.opts) {
     console.log('auth:', args)
-    return this.call('authorize', args).then(res => this.creds = res) 
-    //return this.creds = this.call('authorize', args) 
+    return this.creds = this.call('authorize', args).then(res => this.creds = res) 
    }
 
   /* Implement supported rpc api's from server discovery */
@@ -44,12 +43,38 @@ class Cortex {
   }
 
   /* set callbacks for event handlers and auto subscribe to service if necessary*/
-  on (stream, cb) {
+  on (stream, cb, filter) {
     var stream = stream.substring(0,3)
-    if (this.creds && !this._sub[stream]) this.call('subscribe', {streams: [stream]})
-    if (!this._sub[stream]) this._sub[stream] = []
-    if (cb) this._sub[stream].push(cb)
+    console.log('calling on ', stream)
+    //if (this.creds && !this._sub[stream]) this.call('subscribe', {streams: [stream]})
+    if (!this._sub[stream]) {
+      this.call('subscribe', {streams: [stream]})
+      this._sub[stream] = []
+    }
+    if (cb) this._sub[stream].push(filter ? msg => filter(msg) && cb(msg) : cb)
+    //if (cb) this._sub[stream].push(cb)
     else return new Promise(resolve => { this._sub[stream].push(resolve) })
+  }
+
+  newSession(args) {
+    return this.call('createSession', args).then(ses => {
+      ses.on = (stream, cb, filter) => this.on(stream, 
+        msg => cb(this.toMap(msg, ses)),
+        msg => msg.sid == ses.id && (!filter || filter(this.toMap(msg, ses)))
+      )
+      return ses
+    })
+  }
+  
+  toMap(msg, ses={}) {
+    if (!msg.sid && !ses.id &! msg.sid == ses.id) return msg
+    if (ses.streams) Object.keys(msg).map(key => {
+      if (!ses.streams[key] || !ses.streams[key].cols) return
+      var val = {}
+      ses.streams[key].cols.map((col, ind) => val[col] = msg[key][ind])
+      msg[key] = val
+    })
+    return msg
   }
 
   /* remove callbacks for event handlers and unsubscribe from service */

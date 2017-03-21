@@ -20,7 +20,7 @@ var rpc = {
       clients[sid][stream][args._auth] = client
       console.log('sub clients:', Object.keys(clients[sid][stream]))
     }) 
-    return { sid: args.session }
+    return { sid: sid }
   },
 
   unsubscribe: (args={}, client) => {

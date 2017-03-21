@@ -28,8 +28,8 @@ var client = new Cortex({})
     
     describe("authorize", () => {
       //it("should fail if no client param",() => client.auth().catch(err => expect(err).to.exist))
-      it("should return an _auth token",  () => client.auth(creds).then(_ => expect(client.creds).to.have.property("_auth")))
-      it("should return oan expires date", () => client.auth(creds).then(_ => expect(client.creds).to.have.property("expires")))
+      it("should return an _auth token", () => client.auth(creds).then(_ => expect(client.creds).to.have.property("_auth")))
+      it("should return an expiry date", () => client.auth(creds).then(_ => expect(client.creds).to.have.property("expires")))
     })
 
     describe("createSession", () => {
@@ -48,13 +48,19 @@ var client = new Cortex({})
     })
     
     describe("FACIAL EXPRESSION  Messages", () => {
-      it("should include time stamps", () => client.on('fac').then(_ =>  expect(_.time).to.exist))
-      it("should include session Id", () =>  client.on('fac').then(_ =>  expect(_.sid).to.exist))
-      it("should include Expressions", () =>  client.on('fac').then(_ => expect(_.fac).to.exist))
+      it("should include time stamps", () => client.on('fac').then(_ => expect(_.time).to.exist))
+      it("should include session Id", () =>  client.on('fac').then(_ => expect(_.sid).to.exist))
+      it("should include Expressions", () => client.on('fac').then(_ => expect(_.fac).to.exist))
     })
-  
+    //describe("Filters", () => {
+    //})
  	})
   mocha.run()
+  client.auth(creds)
+  client.newSession({_auth:1}).then(ses => {
+    console.log(ses)
+    ses.on('fac', console.log, msg => msg.fac.smile > 300)
+  })
 </script>
 </body>
 </html>
