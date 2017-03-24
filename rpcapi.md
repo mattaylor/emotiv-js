@@ -92,15 +92,15 @@ _RPC Notify without Response:_
 
 _EEG Data Notificaton:_
 ```javascript
-<< { sid: 'abcd-1234', time: 1489191278895, eeg:[1000.00, 2000.00, 3000.00, 4000.00 ] }
+<< { sid: 'abcd-1234', time: 1489191278895, eeg:[10.00, 20.00, 30.00, 40.00 ] }
 ```
 _Cognitive Performance Notificaton:_
 ```javascript
-<< { sid: 'abcd-1234', time: 1489191278895, cog:[100, 200, 300, 400 ] }
+<< { sid: 'abcd-1234', time: 1489191278895, cog:[10.00, 20.00, 30.00, 40.00 ] }
 ```
 _Combined Notifications:_
 ```javascript
-<< { sid: 'abcd-1234', time: 1489191278895, eeg:[1000.00, 2000.00, 3000.00, 4000.00, 4000.00], con:[4, 4, 4, 4, 4] }
+<< { sid: 'abcd-1234', time: 1489191278895, eeg:[10.00, 20.00, 30.00, 40.00, 40.00], dev:[4, 4, 4, 4, 4, 4] }
 ```
 
 ---
@@ -236,16 +236,16 @@ __EXAMPLES:__
       , stopped: null  
       , headset: 'INSIGHT-1234'
       , markers: []
-      , streams:
-        { con: { cols: ['ALL',  'AF1', 'AF2'], freq: 128, min:0, max:8000 } ] }
-        , pow: { cols: ['Alpha', 'BetaH', 'BetaL','Gamma', 'Theta']}
-        , eeg: { cols: ['Alpha', 'Beta', 'Gamma', 'Theta']}
-        , cog: { cols: ['EXC', 'REL', 'FOC', 'INT', 'FRU', 'ENG', 'LEX'] }
-        , com: { cols: ['Push', 'Push', 'MoveU','MoveD', 'MoveR', 'MoveL'] }
-        , pro: { cols: ['Command', 'Status'], enums:['started', 'stopped'] }
-        , dev: { cols: ['battery', 'signal', 'contact']}
-        , mot: { cols: ['gyroX', 'gyroY', 'gyroZ'] }
-        , fac: { cols: ['Frown', 'Clench','Smile', 'Surprise', 'Laugh', 'Blink', 'Wink_RL', 'look_RL', 'look_UD', 'Smirk_RL'] }
+      , streams: 
+        { eeg: { cols: ['counter', 'interp', 'raw_cq', 'af3', 'af4', 't7', 't8', 'pz'], fmts: ['float'], freq: 128 }
+        , dev: { cols: ['battery', 'bt_signal', 'af3_cq', 'af4_cq', 't7_cq', 't8_cq', 'pz_cq'], fmts: ['enum'], freq: 4 }
+        , cog: { cols: ['noise', 'int', 'med', 'foc', 'fru', 'exc', 'eng', 'lex'], freq: 2 }
+        , pow: { cols: ['alpha','betaH', 'betaL', 'gamma', 'delta'], freq: 8 }
+        , fac: { cols: ['smile', 'laugh', 'clench', 'frown', 'surprise', 'blink', 'smirk_RL', 'look_RL', 'look_UD', 'wink_RL' ], freq: 2 }
+        , mot: { cols: ['counter', 'interp', 'gyroX', 'gyroY',  'gyroZ', 'accX', 'accY', 'accZ', 'magX', 'magY', 'magZ'], fmts: ['float'], freq: 2 }
+        , pro: { cols: ['action', 'status', 'score'] }
+        , tag: { cols: ['context', 'group', 'label' ] }
+        }
       }
     }
 ```
@@ -365,7 +365,7 @@ __EXAMPLES:__
 
 >>  { id: 1, jsonrpc: '2.0', error : { code: 123, text: 'eegData unavailable' }
 
->>  { id:'1234', time: 8888888, cog: [100.01, 100.00, 14.33, 77.00, 89.00 ]}
+>>  { sid:'1234', time: 8888888, cog: [100.01, 100.00, 14.33, 77.00, 89.00 ]}
 ```
 ---
 ## Unsubscribe
@@ -389,7 +389,10 @@ __EXAMPLES:__
       { streams: ['eeg'] }
     }
 
->>  { id: 1, jsonrpc: '2.0', result: [] }
+>>  { id: 1, jsonrpc: '2.0', result: 
+      { sid: 'abcd-234', streams: { eeg: { cols: ['counter', 'interp', 'raw_cq', 'af3', 'af4', 't7', 't8', 'pz'], fmts: [float], freq: 128 }
+      } 
+    }
 ```
 
 ---
