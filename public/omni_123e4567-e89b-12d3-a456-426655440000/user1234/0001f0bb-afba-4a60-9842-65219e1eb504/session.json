@@ -1,0 +1,18 @@
+{
+    "headset": 5573, 
+    "collection_end": "2015-10-20T08:10:30.154Z", 
+    "collection_date": "2015-10-20T07:36:45.153Z", 
+    "photo": "", 
+    "completed": true, 
+    "marker_count": 2, 
+    "note": null, 
+    "length": 1, 
+    "experiment": 28600, 
+    "session_guid": "0001f0bb-afba-4a60-9842-65219e1eb504", 
+    "report_version": "2016-11-28", 
+    "duration": 600, 
+    "chunk_status": "0,1,2,3,4,5,6,7,8,9", 
+    "ref_sensor": 1, 
+    "marker_version": "1.0", 
+    "subject": 3203
+}

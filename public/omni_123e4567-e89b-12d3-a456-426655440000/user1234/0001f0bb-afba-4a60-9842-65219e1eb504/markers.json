@@ -1,0 +1,35 @@
+{
+    "eeg": {
+        "eyes_open": {
+            "capture_id": 0, 
+            "start_sample": 0, 
+            "end_sample": 0
+        }, 
+        "eyes_closed": {
+            "capture_id": 1, 
+            "start_sample": 0, 
+            "end_sample": 0
+        }, 
+        "activity1": {
+            "capture_id": 1001, 
+            "start_sample": 0, 
+            "end_sample": 222232
+        }
+    }, 
+    "affectiv": {
+        "eyes_open": {
+            "capture_id": 0, 
+            "start_sample": 0, 
+            "end_sample": 0
+        }, 
+        "eyes_closed": {
+            "capture_id": 1, 
+            "start_sample": 0, 
+            "end_sample": 0
+        }, 
+        "activity1": {
+            "capture_id": 1001, 
+            "start_sample": 0
+        }
+    }
+}

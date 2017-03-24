@@ -1,4 +1,5 @@
 var server = require('http').createServer()
+var servInd = require('serve-index')
 var url = require('url')
 var WebSocketServer = require('ws').Server
 var wss = new WebSocketServer({ server: server })
@@ -6,10 +7,14 @@ var express = require('express')
 var app = express()
 var port = 8000
 var rpc  = require('./rpcapi')
+app.use(express.static('public'))
+app.use(servInd('public', { icons:true, view:'details'}))
 
+/*
 app.use((req, res) => {
   res.send({ msg: 'hello' })
 })
+*/
 
 wss.on('connection', ws => {
   console.log('location:', url.parse(ws.upgradeReq.url, true))

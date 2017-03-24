@@ -2,7 +2,7 @@ var models = require('./models')
 
 var clients = {}
 var streams = {}
-var session = {}
+var session = { sample : models.sample.Session }
 var latest  = {}
 var message = {}
 
