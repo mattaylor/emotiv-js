@@ -6,8 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "docs": "node bin/mdschema -r docs.yml -o models.md",
-    "_start": "node server.js"
+    "docs": "node bin/mdschema -r docs.yml -o models.md"
   },
   "dependencies": {
     "commander": "^2.9.0",

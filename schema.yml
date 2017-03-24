@@ -59,7 +59,7 @@
         eeg: *stream
         dev: *stream
     tags: { type: array, items: { type: string, faker: hacker.adjective }, notes: Tags for this session }
-    logs: { type: string, format: uri }
+    logs: { type: array, items: { type: string, format: uri } }
    
 - title: Profile
   description: |

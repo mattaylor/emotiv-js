@@ -32,7 +32,13 @@ Session:
     mot: { cols: [counter, interp, gyroX, gyroY,  gyroZ, accX, accY, accZ, magX, magY, magZ], fmts: [float], freq: 2 }
     log: { cols: [level, code, text], fmts: [enum, uint, string], enums: [warn, error, debug] }
     pro: { cols: [action, status, score] }
-  logs: http://localhost:8000/omni_123e4567-e89b-12d3-a456-426655440000/user1234/0001f0bb-afba-4a60-9842-65219e1eb504
+  logs: 
+    - /omni_123e4567-e89b-12d3-a456-426655440000/user1234/0001f0bb-afba-4a60-9842-65219e1eb504/motions.csv
+    - /omni_123e4567-e89b-12d3-a456-426655440000/user1234/0001f0bb-afba-4a60-9842-65219e1eb504/rawEegs.csv
+    - /omni_123e4567-e89b-12d3-a456-426655440000/user1234/0001f0bb-afba-4a60-9842-65219e1eb504/markers.csv
+    - /omni_123e4567-e89b-12d3-a456-426655440000/user1234/0001f0bb-afba-4a60-9842-65219e1eb504/cogPerf.csv
+    
+         
 
 Profile:
   id: 1234.0
