@@ -84,7 +84,7 @@ Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
 **open** | *Boolean* |  | 
 **cols** | *Array [undefined]* |  | 
-**spec** | *Array [undefined]* |  | 
+**fmts** | *Array [undefined]* |  | 
 **freq** | *Integer* | Expected Update Frequency | 
 **unit** | *String* | Unit for unit values | 
 **enums** | *Array [string]* |  | 
@@ -109,10 +109,10 @@ Property | Type | Description | Example
 **profile** | *string* | Profile used for commands &#x2F; facials detections | `"1234/1"`
 **headset** | *String* |  | `"INSIGHT-1234"`
 **client** | *string* | Client Application Identifier | `"myEmotiv"`
-**started** | *String (date-time)* | Session start time | `"2016-12-15T03:37:58.064Z"`
-**stopped** | *String (date-time)* | Session stop  time | `"2016-12-15T03:37:58.064Z"`
+**started** | *String (iso)* | Session start time | `"2016-12-15T03:37:58.064Z"`
+**stopped** | *String (iso)* | Session stop  time | `"2016-12-15T03:37:58.064Z"`
 **markers** | *Array [string]* | Labels for Event Markers | `null`
-**streams** | *Object [Session.streams](#Session.streams)* |  | `{"eeg":{"cols":["AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"],"spec":["float"]},"con":{"cols":["AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"],"spec":["enum"],"enums":["none","poor","fair","good"]},"cog":{"cols":["int","med","foc","fru","exc","eng","lex"]},"dev":{"cols":["battery","signal"],"spec":["enum"],"enums":["none","poor","fair","good"]},"pow":{"cols":["alpha","betaL","betaL","gamma","delta"]},"fac":{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"]},"gps":{"cols":["lat","lon"]},"mot":{"cols":["gyroX","gyroY","gyroZ","accelX","accelY","accelZ"]},"log":{"cols":["level","code","text"],"spec":["enum","uint","string"],"enums":["warn","error","debug"]},"pro":{"cols":["action","status","score"]},"tag":{"cols":["id","group","label"]}}`
+**streams** | *Object [Session.streams](#Session.streams)* |  | `{"eeg":{"cols":["counter","interpolated","raw_cq","af3","af4","t7","t8","pz"],"fmts":["float"],"freq":1},"dev":{"cols":["battery","bt_signal","af3_cq","af4_cq","t7_cq","t8_cq","pz_cq"],"fmts":["enum"],"freq":4,"enums":["none","poor","fair","good"]},"cog":{"cols":["int","med","foc","fru","exc","eng","lex"],"freq":2},"pow":{"cols":["alpha","betaH","betaL","gamma","delta"],"freq":8},"fac":{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"],"freq":2},"gps":{"cols":["lat","lon"]},"mot":{"cols":["counter","interpolated","gyroX","gyroY","gyroZ","accX","accY","accZ","magX","magY","magZ"],"fmts":["float"],"freq":2},"log":{"cols":["level","code","text"],"fmts":["enum","uint","string"],"enums":["warn","error","debug"]},"pro":{"cols":["action","status","score"]},"tag":{"cols":["id","group","label"]}}`
 **tags** | *Array [string]* | Tags for this session | `null`
 **logs** | *Array [undefined]* | Event Log file names for each 10 sec window | `null`
 
@@ -131,45 +131,34 @@ __Example:__
   "streams": {
     "eeg": {
       "cols": [
-        "AF3",
-        "F7",
-        "F3",
-        "FC5",
-        "T7",
-        "P7",
-        "O1",
-        "O2",
-        "P8",
-        "T8",
-        "FC6",
-        "F4",
-        "F8",
-        "AF4"
+        "counter",
+        "interpolated",
+        "raw_cq",
+        "af3",
+        "af4",
+        "t7",
+        "t8",
+        "pz"
       ],
-      "spec": [
+      "fmts": [
         "float"
-      ]
-    },
-    "con": {
-      "cols": [
-        "AF3",
-        "F7",
-        "F3",
-        "FC5",
-        "T7",
-        "P7",
-        "O1",
-        "O2",
-        "P8",
-        "T8",
-        "FC6",
-        "F4",
-        "F8",
-        "AF4"
       ],
-      "spec": [
+      "freq": 1
+    },
+    "dev": {
+      "cols": [
+        "battery",
+        "bt_signal",
+        "af3_cq",
+        "af4_cq",
+        "t7_cq",
+        "t8_cq",
+        "pz_cq"
+      ],
+      "fmts": [
         "enum"
       ],
+      "freq": 4,
       "enums": [
         "none",
         "poor",
@@ -186,31 +175,18 @@ __Example:__
         "exc",
         "eng",
         "lex"
-      ]
-    },
-    "dev": {
-      "cols": [
-        "battery",
-        "signal"
       ],
-      "spec": [
-        "enum"
-      ],
-      "enums": [
-        "none",
-        "poor",
-        "fair",
-        "good"
-      ]
+      "freq": 2
     },
     "pow": {
       "cols": [
         "alpha",
-        "betaL",
+        "betaH",
         "betaL",
         "gamma",
         "delta"
-      ]
+      ],
+      "freq": 8
     },
     "fac": {
       "cols": [
@@ -224,7 +200,8 @@ __Example:__
         "look_RL",
         "look_UD",
         "wink_RL"
-      ]
+      ],
+      "freq": 2
     },
     "gps": {
       "cols": [
@@ -234,13 +211,22 @@ __Example:__
     },
     "mot": {
       "cols": [
+        "counter",
+        "interpolated",
         "gyroX",
         "gyroY",
         "gyroZ",
-        "accelX",
-        "accelY",
-        "accelZ"
-      ]
+        "accX",
+        "accY",
+        "accZ",
+        "magX",
+        "magY",
+        "magZ"
+      ],
+      "fmts": [
+        "float"
+      ],
+      "freq": 2
     },
     "log": {
       "cols": [
@@ -248,7 +234,7 @@ __Example:__
         "code",
         "text"
       ],
-      "spec": [
+      "fmts": [
         "enum",
         "uint",
         "string"
@@ -282,13 +268,12 @@ __Example:__
 Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
 **pro** | *string* |  | `{"cols":["action","status","score"]}`
-**cog** | *string* |  | `{"cols":["int","med","foc","fru","exc","eng","lex"]}`
-**mot** | *string* |  | `{"cols":["gyroX","gyroY","gyroZ","accelX","accelY","accelZ"]}`
-**fac** | *string* |  | `{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"]}`
+**cog** | *string* |  | `{"cols":["int","med","foc","fru","exc","eng","lex"],"freq":2}`
+**mot** | *string* |  | `{"cols":["counter","interpolated","gyroX","gyroY","gyroZ","accX","accY","accZ","magX","magY","magZ"],"fmts":["float"],"freq":2}`
+**fac** | *string* |  | `{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"],"freq":2}`
 **com** | *string* |  | `null`
-**eeg** | *string* |  | `{"cols":["AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"],"spec":["float"]}`
-**dev** | *string* |  | `{"cols":["battery","signal"],"spec":["enum"],"enums":["none","poor","fair","good"]}`
-**qua** | *string* |  | `null`
+**eeg** | *string* |  | `{"cols":["counter","interpolated","raw_cq","af3","af4","t7","t8","pz"],"fmts":["float"],"freq":1}`
+**dev** | *string* |  | `{"cols":["battery","bt_signal","af3_cq","af4_cq","t7_cq","t8_cq","pz_cq"],"fmts":["enum"],"freq":4,"enums":["none","poor","fair","good"]}`
 
 
 
@@ -396,15 +381,15 @@ A Message about an an opened session, sent to clients in response to subscriptio
 Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
 **sid** | *string* |  | `"ABCD-1234-ABCD-1234"`
-**time** | *String (date-time)* |  | `1488926601831`
-**eeg** | *Array [number]* | EEG Data Samples | `[4000,1000,1000,1000,1000,1000,500]`
+**time** | *String (iso)* |  | `1488926601831`
+**eeg** | *Array [number]* | EEG Data Samples | `[40,10,10,10,10,10,50]`
 **cog** | *Array [number]* | Cogntive Metrics | `null`
-**fac** | *Array [number]* | Facial Expressions | `[1,0.341,1,0.444,0.555,1]`
+**fac** | *Array [number]* | Facial Expressions | `[1,0.34,1,0.44,0.55,1]`
 **com** | *Array [number]* | Mental Commands | `null`
 **pow** | *Array [number]* | Band Powers | `null`
 **mot** | *Array [number]* | Motion sensors | `null`
 **qua** | *Array [integer]* | Contact Quality | `null`
-**dev** | *Array [integer]* | Device Status | `[0.99,0.44,0.44]`
+**dev** | *Array [integer]* | Device Status | `[4,1,1,1,0,1]`
 **pro** | *Array [undefined]* | Profile Training | `null`
 **tag** | *Array [integer]* | Context Tags | `null`
 **log** | *Array [integer]* | Log Messages | `null`
@@ -415,15 +400,15 @@ __Example:__
   "sid": "ABCD-1234-ABCD-1234",
   "time": 1488926601831,
   "eeg": [
-    4000,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    500
+    40,
+    10,
+    10,
+    10,
+    10,
+    10,
+    50
   ],
-  "con": [
+  "dev": [
     4,
     1,
     1,
@@ -433,16 +418,11 @@ __Example:__
   ],
   "fac": [
     1,
-    0.341,
+    0.34,
     1,
-    0.444,
-    0.555,
-    1
-  ],
-  "dev": [
-    0.99,
     0.44,
-    0.44
+    0.55,
+    1
   ]
 }
 ```
@@ -468,7 +448,7 @@ Property | Type | Description | Example
 **secret** | *String* | Optional Secret that may be used to sign auth requests as SHA256 HMAC | `null`
 **balance** | *Integer* | Available Session Balance | `20`
 **maxDevices** | *Integer* | Maximum Devices allowed - default is amount &#x2F; 10 ) | `3`
-**dailyLimit** | *Integer* | Maximum Debit per User per Day | `10`
+**dailyLimit** | *Integer* | Maximum Debit per User per Day | `20`
 **expires** | *String (date-time)* | Expiration Date of current billing period | `"2016-12-15T03:37:58.064Z"`
 **devices** | *Array [undefined]* | Current Devices Using License | `["myDev1","myDev2"]`
 **initial** | *Integer* | Initial balance purchased with subscription | `null`
@@ -494,7 +474,7 @@ __Example:__
     "myDev2"
   ],
   "maxDevices": 3,
-  "dailyLimit": 10,
+  "dailyLimit": 20,
   "expires": "2016-12-15T03:37:58.064Z"
 }
 ```
