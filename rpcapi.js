@@ -11,7 +11,8 @@ var rpc = {
   subscribe: (args={}, client) => {
     verify(args, ['_auth', 'streams'])
     if (typeof args.streams === 'string') args.streams = args.streams.split(',')
-    let sid = args.session || latest 
+    let sid = args.session || latest
+    let spec = {} 
     if (!session[sid] || session[sid].status == 'closed') throw('Invalid Session')
     if (!clients[sid]) clients[sid] = {}
     args.streams.map(stream => {
@@ -19,8 +20,9 @@ var rpc = {
       if (!clients[sid][stream]) clients[sid][stream] = {}
       clients[sid][stream][args._auth] = client
       console.log('sub clients:', Object.keys(clients[sid][stream]))
-    }) 
-    return { sid: sid }
+      spec[stream] = session[sid].streams[stream]
+    })
+    return { sid: sid, streams: spec }
   },
 
   unsubscribe: (args={}, client) => {
@@ -46,7 +48,6 @@ var rpc = {
     streams[sid] = []
     Object.keys(ses.streams).map(stream  => {
       if (ses.streams[stream].freq) {
-        console.log('Notifying:', stream, sid )
         streams[sid].push(setInterval(_ => notify(random(stream, sid)), 1000/ses.streams[stream].freq))
       }
     })
@@ -82,16 +83,18 @@ var random = (stream, sid) => {
   if (!message[sid]) message[sid] = {}
   var last = message[sid][stream]
   var spec = session[sid].streams[stream]
-  if (spec.fmts == ['enum']) return Math.round(Math.random() * spec.cols.length)
   let next = [] 
-  if (last) {
+  if (spec.enums) {
+    let n  = spec.cols.length
+    while(n--) next.push(Math.round(Math.random() * spec.enums.length))
+  } else if (last) {
     next = last.map((val, i) => Math.abs(Math.round((val + (Math.random() - 0.5)*50 ) * 100)  / 100))
   } else { 
     let n  = spec.cols.length
     while(n--) next.push(Math.round(Math.random() * 100))
   }
   message[sid][stream] = next
-  console.log(stream, next)
+  //console.log(stream, next)
   msg[stream] = next 
   return msg
 }
