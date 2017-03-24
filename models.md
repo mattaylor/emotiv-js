@@ -112,7 +112,7 @@ Property | Type | Description | Example
 **started** | *String (iso)* | Session start time | `"2016-12-15T03:37:58.064Z"`
 **stopped** | *String (iso)* | Session stop  time | `"2016-12-15T03:37:58.064Z"`
 **markers** | *Array [string]* | Labels for Event Markers | `null`
-**streams** | *Object [Session.streams](#Session.streams)* |  | `{"eeg":{"cols":["counter","interpolated","raw_cq","af3","af4","t7","t8","pz"],"fmts":["float"],"freq":1},"dev":{"cols":["battery","bt_signal","af3_cq","af4_cq","t7_cq","t8_cq","pz_cq"],"fmts":["enum"],"freq":4,"enums":["none","poor","fair","good"]},"cog":{"cols":["int","med","foc","fru","exc","eng","lex"],"freq":2},"pow":{"cols":["alpha","betaH","betaL","gamma","delta"],"freq":8},"fac":{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"],"freq":2},"gps":{"cols":["lat","lon"]},"mot":{"cols":["counter","interpolated","gyroX","gyroY","gyroZ","accX","accY","accZ","magX","magY","magZ"],"fmts":["float"],"freq":2},"log":{"cols":["level","code","text"],"fmts":["enum","uint","string"],"enums":["warn","error","debug"]},"pro":{"cols":["action","status","score"]},"tag":{"cols":["id","group","label"]}}`
+**streams** | *Object [Session.streams](#Session.streams)* |  | `{"eeg":{"cols":["counter","interp","raw_cq","af3","af4","t7","t8","pz"],"fmts":["float"],"freq":128},"dev":{"cols":["battery","bt_signal","af3_cq","af4_cq","t7_cq","t8_cq","pz_cq"],"fmts":["enum"],"freq":4,"enums":["none","poor","fair","good"]},"cog":{"cols":["int","med","foc","fru","exc","eng","lex"],"freq":2},"pow":{"cols":["alpha","betaH","betaL","gamma","delta"],"freq":8},"fac":{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"],"freq":2},"gps":{"cols":["lat","lon"]},"mot":{"cols":["counter","interp","gyroX","gyroY","gyroZ","accX","accY","accZ","magX","magY","magZ"],"fmts":["float"],"freq":2},"log":{"cols":["level","code","text"],"fmts":["enum","uint","string"],"enums":["warn","error","debug"]},"pro":{"cols":["action","status","score"]},"tag":{"cols":["id","group","label"]}}`
 **tags** | *Array [string]* | Tags for this session | `null`
 **logs** | *Array [undefined]* | Event Log file names for each 10 sec window | `null`
 
@@ -132,7 +132,7 @@ __Example:__
     "eeg": {
       "cols": [
         "counter",
-        "interpolated",
+        "interp",
         "raw_cq",
         "af3",
         "af4",
@@ -143,7 +143,7 @@ __Example:__
       "fmts": [
         "float"
       ],
-      "freq": 1
+      "freq": 128
     },
     "dev": {
       "cols": [
@@ -212,7 +212,7 @@ __Example:__
     "mot": {
       "cols": [
         "counter",
-        "interpolated",
+        "interp",
         "gyroX",
         "gyroY",
         "gyroZ",
@@ -269,10 +269,10 @@ Property | Type | Description | Example
 ---- | ---- | ---- | ---- | ----
 **pro** | *string* |  | `{"cols":["action","status","score"]}`
 **cog** | *string* |  | `{"cols":["int","med","foc","fru","exc","eng","lex"],"freq":2}`
-**mot** | *string* |  | `{"cols":["counter","interpolated","gyroX","gyroY","gyroZ","accX","accY","accZ","magX","magY","magZ"],"fmts":["float"],"freq":2}`
+**mot** | *string* |  | `{"cols":["counter","interp","gyroX","gyroY","gyroZ","accX","accY","accZ","magX","magY","magZ"],"fmts":["float"],"freq":2}`
 **fac** | *string* |  | `{"cols":["smile","laugh","clench","frown","suprise","blink","smirk_RL","look_RL","look_UD","wink_RL"],"freq":2}`
 **com** | *string* |  | `null`
-**eeg** | *string* |  | `{"cols":["counter","interpolated","raw_cq","af3","af4","t7","t8","pz"],"fmts":["float"],"freq":1}`
+**eeg** | *string* |  | `{"cols":["counter","interp","raw_cq","af3","af4","t7","t8","pz"],"fmts":["float"],"freq":128}`
 **dev** | *string* |  | `{"cols":["battery","bt_signal","af3_cq","af4_cq","t7_cq","t8_cq","pz_cq"],"fmts":["enum"],"freq":4,"enums":["none","poor","fair","good"]}`
 
 
