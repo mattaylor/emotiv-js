@@ -45,7 +45,10 @@ var rpc = {
     rpc.subscribe({_auth:args._auth, session:sid, streams:args.subscribe}, client)
     streams[sid] = []
     Object.keys(ses.streams).map(stream  => {
-      if (ses.streams[stream].freq) streams[sid].push(setInterval(_ => notify(random(stream, sid)), 1000/ses.streams[stream].freq))
+      if (ses.streams[stream].freq) {
+        console.log('Notifying:', stream, sid )
+        streams[sid].push(setInterval(_ => notify(random(stream, sid)), 1000/ses.streams[stream].freq))
+      }
     })
     return ses
   },
@@ -75,19 +78,22 @@ var rpc = {
 }
 
 var random = (stream, sid) => {
-  let next = { sid: sid, time: new Date().getTime() }
+  let msg = { sid: sid, time: new Date().getTime() }
   if (!message[sid]) message[sid] = {}
-  let last = message[sid][stream]
-  next[stream] = [] 
+  var last = message[sid][stream]
+  var spec = session[sid].streams[stream]
+  if (spec.fmts == ['enum']) return Math.round(Math.random() * spec.cols.length)
+  let next = [] 
   if (last) {
-    next[stream] = last.data = last.data.map((val, i) => 
-      val -= Math.round((Math.random() - 0.5)*50 + ((val - last.init[i]) * 0.01)))
-  } else {
-    let n  = session[sid].streams[stream].cols.length
-    while(n--) next[stream].push(Math.round(Math.random() * 1000))
-    message[sid][stream] = { data: next[stream], init: next[stream] }
+    next = last.map((val, i) => Math.abs(Math.round((val + (Math.random() - 0.5)*50 ) * 100)  / 100))
+  } else { 
+    let n  = spec.cols.length
+    while(n--) next.push(Math.round(Math.random() * 100))
   }
-  return next
+  message[sid][stream] = next
+  console.log(stream, next)
+  msg[stream] = next 
+  return msg
 }
 
 var notify = (message) => {

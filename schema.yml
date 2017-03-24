@@ -27,7 +27,7 @@
   properties: &stream
     open: { type: boolean, default: true } 
     cols: { type: array, minItems: 4, items: { faker: hacker.abbreviation } } 
-    spec: { type: array, items: { enum: [ enum, unit, word, uint, pcts, time] } }
+    fmts: { type: array, items: { enum: [ enum, unit, word, uint, pcts, time] } }
     freq: { type: integer, minimum: 1, maximum: 256, notes: 'Expected Update Frequency' }
     unit: { type: string, enum: [Hz, Mv, Pct], notes: 'Unit for unit values' }
     enums: { type: array,  items: { type: string, faker: random.word }, 'String labels for enummerated values' } 
@@ -49,7 +49,7 @@
     markers: { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
     streams:   
       type: object
-      required: [eeg,cog,mot,dev,pro,fac,qua,com]
+      required: [eeg,cog,mot,dev,pro,fac,com]
       properties: 
         pro: *stream
         cog: *stream
@@ -58,7 +58,6 @@
         com: *stream
         eeg: *stream
         dev: *stream
-        qua: *stream
     tags: { type: array, items: { type: string, faker: hacker.adjective }, notes: Tags for this session }
     logs: 
       type: array

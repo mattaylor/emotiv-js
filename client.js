@@ -41,7 +41,7 @@ class Cortex {
     if (cb) this._rpc[req.id] = { res: cb }
     else return new Promise((resolve, reject) => { this._rpc[req.id] = { res: resolve, err: reject } })
   }
-
+//C:\Users\mat\Downloads\Patch Tool\tools\VM Tool.iso
   /* set callbacks for event handlers and auto subscribe to service if necessary*/
   on (stream, cb, filter) {
     var stream = stream.substring(0,3)

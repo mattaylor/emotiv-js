@@ -56,7 +56,7 @@ Param   | Required | Description
 id      | Yes      | Session Id
 time    | Yes      | Message Timestamp  
 pro | No       | Profile Training Messages (eg training started, completed)
-dev | No       | Headset Device (eg connection status, battery and signal strength)
+dev | No       | Headset Device (eg connection status, battery and signal strength and contact quality)
 fac | No       | Facial Expression Detection Messages 
 com | No       | Mental Command Detection Messages 
 ses | No       | Session Update Messages (eg changes to status, headset or profile)
@@ -64,7 +64,6 @@ cog | No       | Cognive Performance Metrics
 eeg | No       | Raw EEG Samples
 dev | No       | Raw EEG Samples
 mot | No       | Gyroscope Motion Samples
-con | No       | Contact Quality  Measures including battery and signal strength
 
 __EXAMPLES:__
 
@@ -93,15 +92,15 @@ _RPC Notify without Response:_
 
 _EEG Data Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eeg:[1000.00, 2000.00, 3000.00, 4000.00 ] }
+<< { sid: 'abcd-1234', time: 1489191278895, eeg:[1000.00, 2000.00, 3000.00, 4000.00 ] }
 ```
 _Cognitive Performance Notificaton:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, cog:[100, 200, 300, 400 ] }
+<< { sid: 'abcd-1234', time: 1489191278895, cog:[100, 200, 300, 400 ] }
 ```
 _Combined Notifications:_
 ```javascript
-<< { id: 'abcd-1234', time: 1489191278895, eeg:[1000, 2000, 3000, 4000, 4000], con:[99, 55,  22, 44, 44] }
+<< { sid: 'abcd-1234', time: 1489191278895, eeg:[1000.00, 2000.00, 3000.00, 4000.00, 4000.00], con:[4, 4, 4, 4, 4] }
 ```
 
 ---

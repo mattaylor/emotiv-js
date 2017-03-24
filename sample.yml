@@ -23,15 +23,14 @@ Session:
   stopped: 2016-12-15T03:37:58.064Z
   status: active
   streams: 
-   eeg: { cols: *sensors, spec: [float], freq: 128 }
-   con: { cols: *sensors, spec: [enum], freq: 2, enums: [none, poor, fair, good] }
+   eeg: { cols: [counter, interpolated, raw_cq, af3, af4, t7, t8, pz], fmts: [float], freq: 1 }
+   dev: { cols: [battery, bt_signal, af3_cq, af4_cq, t7_cq, t8_cq, pz_cq], fmts: [enum], freq: 4, enums: [none, poor, fair, good] }
    cog: { cols: [int, med, foc, fru, exc, eng, lex], freq: 2 }
-   dev: { cols: [battery, signal, ], spec: [enum], freq: 2, enums: [none, poor, fair, good ] }
-   pow: { cols: [alpha, betaL, betaL, gamma, delta], freq: 8 }
+   pow: { cols: [alpha, betaH, betaL, gamma, delta], freq: 8 }
    fac: { cols: [smile, laugh, clench, frown, suprise, blink, smirk_RL, look_RL, look_UD, wink_RL ], freq: 2 }
    gps: { cols: [lat, lon] }
-   mot: { cols: [gyroX, gyroY,  gyroZ, accelX, accelY, accelZ], freq: 2 }
-   log: { cols: [level, code, text], spec: [enum, uint, string], enums: [warn, error, debug] }
+   mot: { cols: [counter, interpolated, gyroX, gyroY,  gyroZ, accX, accY, accZ, magX, magY, magZ], fmts: [float], freq: 2 }
+   log: { cols: [level, code, text], fmts: [enum, uint, string], enums: [warn, error, debug] }
    pro: { cols: [action, status, score] }
    tag: { cols: [id, group, label ] }
 
@@ -66,13 +65,12 @@ License:
   period: 30
   devices: [ myDev1, myDev2 ]
   maxDevices: 3
-  dailyLimit: 10
+  dailyLimit: 20
   expires: 2016-12-15T03:37:58.064Z
 
 Message: 
   sid: ABCD-1234-ABCD-1234
   time: 1488926601831
-  eeg: [4000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 500.00]
-  con: [4, 1, 1, 1, 0, 1]
-  fac: [1, 0.341, 1, 0.444, 0.555, 1]
-  dev: [0.99, 0.44, 0.44]
+  eeg: [40.00, 10.00, 10.00, 10.00, 10.00, 10.00, 50.00]
+  dev: [4, 1, 1, 1, 0, 1]
+  fac: [1, 0.34, 1, 0.44, 0.55, 1]
