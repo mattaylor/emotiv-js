@@ -23,7 +23,7 @@ var schema = {}
 
 models.map(s => schema[s.title.toLowerCase()] = fixit(s))
 
-console.log(schema)
+//console.log(schema)
 
 
 jsf.format('iso', (gen, schema) => new Date().toISOString())
@@ -34,7 +34,7 @@ jsf.format('word',(gen, schema) => '1234.' + new Date().getTime())
 //Object.keys(schema).forEach(type => { sample[type] = jsf(schema[type], schema) })
 //var sample = jsf(schema.profile)
 
-console.log(sample)
+//console.log(sample)
 
 module.exports = {
   schema: schema,

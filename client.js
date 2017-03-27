@@ -9,7 +9,7 @@ class Cortex {
     if (opts.client) this.auth(opts)
     this.sock.onmessage = msg => {
       var data = JSON.parse(msg.data)
-      console.log('MESSAGE:', data)
+      //console.log('MESSAGE:', data)
       if (data.methods) return this.init(data.methods, next)
       if (data.sid) return Object.keys(this._sub).map(key => data[key] && this._sub[key].map(cb => cb(data)))
       if (!this._rpc[data.id]) throw('Invalid Response: '+data)
@@ -41,23 +41,21 @@ class Cortex {
     if (cb) this._rpc[req.id] = { res: cb }
     else return new Promise((resolve, reject) => { this._rpc[req.id] = { res: resolve, err: reject } })
   }
-//C:\Users\mat\Downloads\Patch Tool\tools\VM Tool.iso
+
   /* set callbacks for event handlers and auto subscribe to service if necessary*/
   on (stream, cb, filter) {
     var stream = stream.substring(0,3)
-    console.log('calling on ', stream)
-    //if (this.creds && !this._sub[stream]) this.call('subscribe', {streams: [stream]})
     if (!this._sub[stream]) {
       this.call('subscribe', {streams: [stream]})
       this._sub[stream] = []
     }
     if (cb) this._sub[stream].push(filter ? msg => filter(msg) && cb(msg) : cb)
-    //if (cb) this._sub[stream].push(cb)
-    else return new Promise(resolve => { this._sub[stream].push(resolve) })
+    else return new Promise(res => { this._sub[stream].push(filter ? msg => filter(msg) && res(msg) : res) })
   }
 
+  /* Create a new session and return promise with 'on' event handler to handle session based message.*/
   newSession(args) {
-    return this.call('createSession', args).then(ses => {
+    return this.call('createSession', args).then(ses => { 
       ses.on = (stream, cb, filter) => this.on(stream, 
         msg => cb(this.toMap(msg, ses)),
         msg => msg.sid == ses.id && (!filter || filter(this.toMap(msg, ses)))
