@@ -60,7 +60,6 @@ var rpc = {
     return ses
   },
 
-
   updateSession: (args={}, client) => {
     verify(args, ['_auth'])
     let sid = args.session || latest
