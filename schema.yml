@@ -47,7 +47,7 @@
     started: { type: string, format: iso,  faker: date.recent, notes: Session start time }
     stopped: { type: string, format: iso,  faker: date.recent, notes: Session stop  time }
     markers: 
-      type: array,  
+      type: array
       items: { type: object, properties: { label: { type: string,  faker: hacker.ingverb, notes: Label for Event Markers } } }  
     streams:   
       type: object
