@@ -6,6 +6,7 @@ var req =  require('require-yml')
 var models = req('./schema.yml')
 var sample = req('./sample.yml')
 
+
 console.log(models)
 
 var fixit = s => {
@@ -19,6 +20,7 @@ var fixit = s => {
 }
 
 var schema = {}
+
 //var sample = {}
 
 models.map(s => schema[s.title.toLowerCase()] = fixit(s))

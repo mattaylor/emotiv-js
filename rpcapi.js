@@ -36,7 +36,13 @@ var rpc = {
   createSession: (args={}, client) => {
     verify(args, ['_auth'])
     let sid = latest = new Date().getTime()
-    let ses = { id: sid,created: new Date().toISOString(),  status: args.status || 'active', streams: models.sample.Session.streams}
+    let ses = { 
+      id: sid, 
+      created: new Date().toISOString(), 
+      markers:[], 
+      status: args.status || 'active', 
+      streams: models.sample.Session.streams
+    }
     ses = models.genDoc('session', ses)
     if (ses.status == 'active') ses.started =  ses.created
     ses.stopped = null
@@ -75,7 +81,27 @@ var rpc = {
   queryHeadsets : (args) => [ models.genDoc('headset') ],
   querySessions : (args) => Object.keys(session).map(sid => session[sid]),
   querySubjects : (args) => [ models.getDoc('subject') ],
-  queryProfiles : (args) => [ models.getDoc('profile') ]
+  queryProfiles : (args) => [ models.getDoc('profile') ],
+  
+  injectMarker : (args) => {
+    verify(args, ['label', '_auth']) 
+    var ses = args.session ?  session[args.session] : session[latest]
+    if (!ses) throw ('invalid session id')
+    if (ses.status == 'closed') throw ('Session Closed')
+    var mark = { label:args.label, enums:[], events:[] }
+    var mInd = ses.markers ? ses.markers.findIndex(_ => _.label == args.label) + 1 : 0
+    if (mInd) mark = ses.markers[mInd-1] 
+    else if (ses.markers) ses.markers.push(mark)
+    else ses.markers = [mark]
+    var mVal = parseInt(args.value) || 0
+    if (!mVal && typeof args.value === 'string') {
+      if (!mark.enums) mark.enums = [] 
+      mVal = (mark.enums.findIndex(_ => _ == mVal) + 1) || mark.enums.push(args.value)
+    }
+    if (!mark.events) mark.events = []
+    mark.events.push([args.time || new Date().getTime(), mVal])
+    return ses
+  }
 }
 
 var random = (stream, sid) => {
