@@ -30,14 +30,14 @@
     fmts: { type: array, items: { enum: [ enum, unit, word, uint, pcts, time] } }
     freq: { type: integer, minimum: 1, maximum: 256, notes: 'Expected Update Frequency' }
     unit: { type: string, enum: [Hz, Mv, Pct], notes: 'Unit for unit values' }
-    enums: { type: array,  items: { type: string, faker: random.word }, 'String labels for enummerated values' } 
+    enums: { type: array,  items: { type: string }, 'String labels for enummerated values' } 
 - title: Session
   description: | 
     Represents an continuous period of eeg related activity using an emotive headset
   required: [id]
   properties: 
     id: { pattern: 'w{4}.\d{8}', notes: 'Session GUID', faker: random.uuid }
-    label:   { faker: random.word }
+    label:   { faker: hacker.noun }
     status:  { enum: [ready, active, error, closed] }
     subject: { pattern: '\w{4}', notes: Emotiv Subject Id }
     license: { pattern: '\w{8}', notes: License used to create session }
@@ -46,7 +46,9 @@
     client:  { pattern: '\w{8}', faker: commerce.productName, notes: Client Application Identifier }
     started: { type: string, format: iso,  faker: date.recent, notes: Session start time }
     stopped: { type: string, format: iso,  faker: date.recent, notes: Session stop  time }
-    markers: { type: array,  items: { type: string,  faker: hacker.ingverb }, notes: Labels for Event Markers }
+    markers: 
+      type: array,  
+      items: { type: object, properties: { label: { type: string,  faker: hacker.ingverb, notes: Label for Event Markers } } }  
     streams:   
       type: object
       required: [eeg,cog,mot,dev,pro,fac,com]
