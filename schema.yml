@@ -8,7 +8,7 @@
     dongle: { pattern: 'U\d{8}', notes: 'Dongle serial Id'}
     status: { enum: [ CONNECTED, DISCONNECTED, INUSE ] }
     serial: { type: string, faker: random.uuid }
-    hardware: { type: string, notes: Hardware version, faker: system.semver }
+    hardware: { type: string, notes: Hardware version, faker: 'system.semver' }
     firmware: { pattern: 'v\d\.\d{2}', notes: 'Firmware version', faker: system.semver }
     sensors: { type: array, items: { pattern: '\w{2}', notes: EEG Sensor Names } }
     settings: 

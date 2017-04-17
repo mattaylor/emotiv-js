@@ -14,10 +14,12 @@
 <script>
 var expect = chai.expect
 mocha.setup('bdd')
+//var host = 'limbic-dev.emotivcloud.com'
+var host = 'localhost'
 
-var creds = { client: 'myApp1'}
+var creds = { host: host, port: 8000, client: 'myApp1'}
 
-var client = new Cortex({}) 
+var client = new Cortex({host:host, port: 8000}) 
 //, client => {
   
 	describe("cortex", () => {
@@ -41,19 +43,24 @@ var client = new Cortex({})
       it("list should list headsets", () => client.call("queryHeadsets").then(_ => expect(_[0]).to.include.keys(['id','serial','dongle','status'])))
     })
 
-    describe("EEG Data Messages", () => {
+    describe("EEG Data", () => {
       it("should include time stamps", () => client.on('eeg').then(_ =>  expect(_.time).to.exist))
       it("should include session Id", () =>  client.on('eeg').then(_ =>  expect(_.sid).to.exist))
       it("should include eeg samples", () => client.on('eeg').then(_ =>  expect(_.eeg).to.exist))
     })
     
-    describe("FACIAL EXPRESSION  Messages", () => {
+    describe("Facial Expressions", () => {
       it("should include time stamps", () => client.on('fac').then(_ => expect(_.time).to.exist))
       it("should include session Id", () =>  client.on('fac').then(_ => expect(_.sid).to.exist))
       it("should include Expressions", () => client.on('fac').then(_ => expect(_.fac).to.exist))
     })
-    //describe("Filters", () => {
-    //})
+    
+    describe("Inject Markers", () => {
+      it("should fail if no label given", () => client.call('injectMarker').catch(_ => expect(_[0]).to.exist))
+      it("should add markers to session", () => client.call('injectMarker', { label:'testLabel'} )
+        .then(_ => expect(_.markers[_.markers.length-1]).to.have.property('label', 'testLabel'))
+      )
+    })
  	})
   mocha.run()
   client.auth(creds)

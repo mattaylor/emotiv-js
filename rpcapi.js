@@ -77,10 +77,10 @@ var rpc = {
   createMarker: (args={}, client) => verify(args, ['id', 'note', 'time']) ? 'ok' : null,
   authorize : (args, client) => verify(args, ['client']) ? models.genDoc('authresponse', args) : null,
   createSubject : (args, client) => verify(args, ['_auth']) ? models.genDoc('subject', args) : null,
-  queryHeadsets : (args) => [ models.genDoc('headset') ],
+  queryHeadsets : (args) => [ models.genDoc('headset') ] ,
   querySessions : (args) => Object.keys(session).map(sid => session[sid]),
-  querySubjects : (args) => [ models.getDoc('subject') ],
-  queryProfiles : (args) => [ models.getDoc('profile') ],
+  querySubjects : (args) => [ models.genDoc('subject') ],
+  queryProfiles : (args) => [ models.genDoc('profile') ],
   
   injectMarker : (args) => {
     verify(args, ['label', '_auth']) 
@@ -90,8 +90,7 @@ var rpc = {
     var mark = { label:args.label, enums:[], events:[] }
     var mInd = ses.markers ? ses.markers.findIndex(_ => _.label == args.label) + 1 : 0
     if (mInd) mark = ses.markers[mInd-1] 
-    else if (ses.markers) ses.markers.push(mark)
-    else ses.markers = [mark]
+    else ses.markers.push(mark)
     var mVal = parseInt(args.value) || 0
     if (!mVal && typeof args.value === 'string') {
       if (!mark.enums) mark.enums = [] 
