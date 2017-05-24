@@ -9,10 +9,10 @@ class Cortex {
     if (opts.client) this.auth(opts)
     this.sock.onmessage = msg => {
       var data = JSON.parse(msg.data)
+      console.log('RESPONSE:', data)
       if (data.methods) return this.init(data.methods, next)
       if (data.sid) return Object.keys(this._sub).map(key => data[key] && this._sub[key].map(cb => cb(data)))
-      console.log('RESPONSE:', data)
-      if (!this._rpc[data.id]) throw('Invalid Response: '+JSON.strinigify(data))
+      if (!this._rpc[data.id]) throw('Invalid Response: '+JSON.stringify(data))
       if (data.error && this._rpc[data.id].err) this._rpc[data.id].err(data.error)
       else this._rpc[data.id].res(data.result, data.error)
       delete this._rpc[data.id]
@@ -55,13 +55,15 @@ class Cortex {
 
   /* Create a new session and return promise with 'on' event handler to handle session based message.*/
   newSession(args) {
-    return this.call('createSession', args).then(ses => { 
-      ses.on = (stream, cb, filter) => this.on(stream, 
+    var prom = this.call('createSession', args)
+    return { 
+      call: (method, args) => prom.then(ses => this.call(method, Object.assign(args, {session:ses.id}))),
+      off : (stream) => prom.then(ses => this.off(stream, ses.id)),
+      on  : (stream, cb, filter) => prom.then(ses => this.on(stream, 
         msg => cb(this.toMap(msg, ses)),
         msg => msg.sid == ses.id && (!filter || filter(this.toMap(msg, ses)))
-      )
-      return ses
-    })
+      ))
+    }
   }
   
   toMap(msg, ses={}) {

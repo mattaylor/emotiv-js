@@ -1,0 +1,107 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cortex Demo</title>
+<style>
+  .panel { 
+    width: 200px;
+    height: 200px;
+    font-size: 30px;
+    color: #000;
+    padding:10px;
+    margin:10px;
+    text-align: center;
+    vertical-align: center;
+    background: #888
+  }
+  .circle { 
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 10px;
+    color: #fff;
+    line-height: 50px;
+    text-align: center;
+    background: #000
+  }
+</style>
+
+<script src="./client.js"></script>
+<script>
+
+var host = 'limbic-dev.emotivcloud.com'
+var creds = { host: host, port: 8000, client: 'myApp1', client_secret:'mySecret'}
+var debug = true
+
+var exp  = {
+  title : 'Experiment 1',
+  phase : [
+    { duration: 5000, content:'hello'},
+    { duration: 5000, content:'world'}
+  ]
+}
+
+var log = (msg) => debug && console.log(msg)
+var err = (msg) => console.log('ERROR:', msg)
+var div = (id)  => document.getElementById(id)
+
+var cortex = new Cortex(creds).newSession(Object.assign(creds, { project:exp.title, subject:'sub1'}))
+
+var colors = ['black', 'red', 'yellow', 'green']
+
+function showMap() {
+  div('mapToggle').innerText = 'Hide Map'
+  div('mapToggle').onclick = hideMap
+  div('cqMap').style.display = 'block'
+  cortex.on('dev', drawMap)
+ }
+
+function drawMap(evt) { 
+  Object.keys(evt.dev).map(c => {
+    if (div(c)) div(c).style.background = colors[evt.dev[c]]
+  })
+}
+
+function hideMap() {
+  div('mapToggle').innerText = 'Show Map'
+  div('mapToggle').onclick = showMap
+  div('cqMap').style.display = 'none'
+  cortex.off('dev').then(log).catch(err)
+}
+
+function initPhase(id=0) {
+  if (!exp.phase[id]) {
+    div('phase').innerHTML = 'EXPERIMENT COMPLETE'
+    return cortex.call('updateSession', { status:'stopped'})
+  }
+  console.log('Init Phase', exp.phase[id])
+  div('phase').innerHTML = exp.phase[id].content
+  cortex.call('startRecording', id)
+  setTimeout(_ => stopPhase(id), exp.phase[id].duration)
+}
+
+function stopPhase(id=0) { 
+  console.log('Stop Phase', exp.phase[id])
+  cortex.call('stopRecording', id)
+  div('phase').innerHTML = `PHASE ${id} COMPLETE, `
+  setTimeout(_ => initPhase(id+1), 2000)
+}
+
+</script>
+</head>
+<body>
+  <button id="mapToggle", onclick="showMap()">Show Map</button>
+  <button id="initPhase", onclick="initPhase()"> BEGIN</button>
+  <hr/>
+  <div id="cqMap" style='width:300; float: right; display:none'>
+    <div id="af3_cq" class="circle">AF3</div>
+    <div id="af4_cq" class="circle">AF4</div>
+    <div id="pz_cq" class="circle">PZ</div>
+    <div id="t7_cq" class="circle">T7</div>
+    <div id="t8_cq" class="circle">T8</div>
+  </div>
+  <div id="phase" class="panel"></div>
+</body>
+</html>
+
+

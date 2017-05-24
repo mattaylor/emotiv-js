@@ -7,6 +7,12 @@ var latest  = {}
 var message = {}
 
 var rpc = {
+  6400503171430
+  2.30 LG. 
+
+- 2225.45 (total interest)
+- .. 
+- .. 
 
   subscribe: (args={}, client) => {
     verify(args, ['_auth', 'streams'])
@@ -84,6 +90,7 @@ var rpc = {
   
   injectMarker : (args) => {
     verify(args, ['label', '_auth']) 
+    var value = args.value || args.stop
     var ses = args.session ?  session[args.session] : session[latest]
     if (!ses) throw ('invalid session id')
     if (ses.status == 'closed') throw ('Session Closed')
@@ -91,16 +98,22 @@ var rpc = {
     var mInd = ses.markers ? ses.markers.findIndex(_ => _.label == args.label) + 1 : 0
     if (mInd) mark = ses.markers[mInd-1] 
     else ses.markers.push(mark)
-    var mVal = parseInt(args.value) || 0
-    if (!mVal && typeof args.value === 'string') {
+    var mVal = parseInt(value) || 0
+    if (!mVal && typeof value === 'string') {
       if (!mark.enums) mark.enums = [] 
-      mVal = (mark.enums.findIndex(_ => _ == mVal) + 1) || mark.enums.push(args.value)
+      mVal = (mark.enums.findIndex(_ => _ == value) + 1) || mark.enums.push(value)
     }
+    if (mVal && args.stop) mVal = mVal * - 1
     if (!mark.events) mark.events = []
     mark.events.push([args.time || new Date().getTime(), mVal])
     return ses
   }
 }
+
+95539.25
+3786.86 due
+
+ 
 
 var random = (stream, sid) => {
   let msg = { sid: sid, time: new Date().getTime() }

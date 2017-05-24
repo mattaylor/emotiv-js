@@ -149,6 +149,11 @@ new Cortex({client:'myApp1', license:'myLic'}).createSession().then(client  => {
   client.on(qua, msg => { /* do something with contact quality for this session */ } 
   client.on(eeg, msg => { /* do something with contact quality for this session */ } 
 })
+
+var session = new Cortex({client:'myApp1', license:'myLic'}).newSession({project:'experiment1',...})
+
+session.call('injectMarker', { stop:12, label:'phase1'}) 
+
 ```
 
 __Session Based:__
