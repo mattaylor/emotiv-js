@@ -3,6 +3,10 @@
 <meta charset="utf-8">
 <title>Cortex Demo</title>
 <style>
+  .viewer { 
+    width:300; float: right; display: none;
+  }
+  
   .panel { 
     width: 200px;
     height: 200px;
@@ -26,11 +30,28 @@
   }
 </style>
 
+<!--
+  <script src="https://rawgit.com/mattaylor/emotiv-js/master/client.js"></script>
+-->
 <script src="./client.js"></script>
+<script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
+
 <script>
 
-var host = 'limbic-dev.emotivcloud.com'
-var creds = { host: host, port: 8000, client: 'myApp1', client_secret:'mySecret'}
+//var host = 'limbic-dev.emotivcloud.com'
+//var creds = { host: host, port: 8000, client: 'myApp1', client_secret:'mySecret'}
+
+var creds = { 
+  host: 'localhost', 
+  _host: '192.168.19.128',
+  port: 54321,  
+  username: "cortextest",
+  password: "Zxcvbnm1",
+  client_id: "dLtw8yCxBXdIqdlDKHmhB2Sx5gI91amybjUGnaJx",
+  client_secret:"Bg84uRfKi4k58tYxkUS0fGpEvrANaYrvQ6CwNwXyRnvWtUTxagerHUW47LxWdWvSlSlGlt6cMdrGL8Pi6iSQwYXrpcTxXE2x0BHDTsYbZjn6iYVqF0Mu0XptfEY5zgjo",
+  debit: 100
+}
+
 var debug = true
 
 var exp  = {
@@ -42,66 +63,105 @@ var exp  = {
 }
 
 var log = (msg) => debug && console.log(msg)
-var err = (msg) => console.log('ERROR:', msg)
+var err = (msg) => div('player').innerHTML = msg.message ? msg.message : msg
 var div = (id)  => document.getElementById(id)
 
-var cortex = new Cortex(creds).newSession(Object.assign(creds, { project:exp.title, subject:'sub1'}))
+var cortex = new Cortex(creds)
+var session = cortex.newSession({ project:exp.title, subject:'sub1'})
+var colors = ['black', 'grey', 'red', 'yellow', 'green']
 
-var colors = ['black', 'red', 'yellow', 'green']
-
-function showMap() {
-  div('mapToggle').innerText = 'Hide Map'
-  div('mapToggle').onclick = hideMap
-  div('cqMap').style.display = 'block'
-  cortex.on('dev', drawMap)
- }
-
-function drawMap(evt) { 
-  Object.keys(evt.dev).map(c => {
-    if (div(c)) div(c).style.background = colors[evt.dev[c]]
-  })
+var views = { 
+  dev: {
+    name: 'Contact Quality', 
+    draw: (evt) => Object.keys(evt.dev).map(c => div(c) ? div(c).style.background = colors[evt.dev[c]] : null) 
+  },
+  cog: (()=> {
+    var n = 5
+    var c = Math.round(((255 / (n - 1)) || 0)) 
+    var lines = []
+    var grid = { strokeStyle: 'rgb(60, 0, 0)', fillStyle: 'rgb(30, 0, 0)', lineWidth: 1, millisPerLine: 500, verticalSections: 10 }
+    var chart = new SmoothieChart({ grid: grid })
+    while(n--) lines.push(new TimeSeries())
+    lines.map((line, i) => {
+      var rgb = [255-(c*i),c*i,Math.round(Math.random()*255)].join(',')
+      chart.addTimeSeries(line, { strokeStyle: 'rgba('+rgb+', 1)', fillStyle: 'rgba('+rgb+', 0)', lineWidth: 2 })
+    })
+    chart.streamTo(document.getElementById("cogCanvas"), Math.round(1000/256))
+    return {
+      name: 'Affect Metrics', 
+      draw: (evt) => lines.map((line, i) => line.append(evt.time, evt.data[i]))
+      //div('cogViewer').innerHTML = '<pre>'+JSON.stringify(evt.cog)+'</pre>'+div('cogViewer').innerHTML
+    }
+  })()
 }
 
-function hideMap() {
-  div('mapToggle').innerText = 'Show Map'
-  div('mapToggle').onclick = showMap
-  div('cqMap').style.display = 'none'
-  cortex.off('dev').then(log).catch(err)
+function init(exp) {
+  if (!cortex.is('OPEN')) cortex = new Cortex(creds) 
+  div('player').innerHTML = 'EXPERIMENT STARTING..'
+  div('sesToggle').innerText = 'STOP'
+  div('sesToggle').onclick = () => done()
+  if (!session) session = cortex.newSession({ project:exp.title, subject:'sub1'})
+  session.then(_ => play(0), err)
 }
 
-function initPhase(id=0) {
-  if (!exp.phase[id]) {
-    div('phase').innerHTML = 'EXPERIMENT COMPLETE'
-    return cortex.call('updateSession', { status:'stopped'})
-  }
-  console.log('Init Phase', exp.phase[id])
-  div('phase').innerHTML = exp.phase[id].content
-  cortex.call('startRecording', id)
-  setTimeout(_ => stopPhase(id), exp.phase[id].duration)
+function done() {
+  div('sesToggle').innerText = 'START'
+  div('sesToggle').onclick = () => init(exp)
+  div('player').innerHTML = 'EXPERIMENT COMPLETE'
+  if (session) session.set({ status:'close'})
+  session = null
 }
 
-function stopPhase(id=0) { 
-  console.log('Stop Phase', exp.phase[id])
-  cortex.call('stopRecording', id)
-  div('phase').innerHTML = `PHASE ${id} COMPLETE, `
-  setTimeout(_ => initPhase(id+1), 2000)
+function show(stream) {
+  div(stream+'Toggle').innerText = 'Hide '+views[stream].name
+  div(stream+'Toggle').onclick = () => hide(stream)
+  div(stream+'Viewer').style.display = 'block'
+  if (session) session.on(stream, views[stream].draw)
+}
+
+function hide(stream) {
+  div(stream+'Toggle').innerText = 'Show '+views[stream].name
+  div(stream+'Toggle').onclick = () => show(stream)
+  div(stream+'Viewer').style.display = 'none'
+  if (session) session.off(stream).then(log).catch(err)
+}
+
+function play(id=0) {
+  if (!exp.phase[id]) return done()
+  div('player').innerHTML = exp.phase[id].content
+  //if (session) session.call('startRecording', id)
+  setTimeout(_ => next(id),exp.phase[id].duration)
+}
+
+function next(id) {
+  //if (session) session.call('stopRecording', id)
+  div('player').innerHTML = `PHASE ${id+1} COMPLETE`
+  setTimeout(_ => play(id+1), 2000)
 }
 
 </script>
 </head>
+
 <body>
-  <button id="mapToggle", onclick="showMap()">Show Map</button>
-  <button id="initPhase", onclick="initPhase()"> BEGIN</button>
-  <hr/>
-  <div id="cqMap" style='width:300; float: right; display:none'>
-    <div id="af3_cq" class="circle">AF3</div>
-    <div id="af4_cq" class="circle">AF4</div>
-    <div id="pz_cq" class="circle">PZ</div>
-    <div id="t7_cq" class="circle">T7</div>
-    <div id="t8_cq" class="circle">T8</div>
+  <div id='menu' style='align:center'>
+    <button id="devToggle" onclick="show('dev')">Show Contact Quality</button>
+    <button id="cogToggle" onclick="show('cog')">Show Affect  Metrics</button>
+    <button id="sesToggle" onclick="init(exp)"> BEGIN</button>
   </div>
-  <div id="phase" class="panel"></div>
+  <hr/>
+
+  <div id="viewers" style='width:300; float: right'>
+    <div id="devViewer" class="viewer">
+      <div id="IEE_CHAN_AF3" class="circle">AF3</div>
+      <div id="IEE_CHAN_AF4" class="circle">AF4</div>
+      <div id="IEE_CHAN_T7" class="circle">TZ</div>
+      <div id="IEE_CHAN_Pz" class="circle">Pz</div>
+      <div id="IEE_CHAN_T8" class="circle">T8</div>
+     </div>
+    <div id="cogViewer" class="viewer">
+      <canvas id="cogCanvas" width="600" height="600"></canvas>
+    </div>
+  </div>
+  <div id="player" class="panel"></div>
 </body>
 </html>
-
-
