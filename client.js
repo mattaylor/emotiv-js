@@ -3,7 +3,8 @@ class Cortex {
 
   constructor (opts = {}, next) {
     Object.assign(this, { opts:opts, api:{}, _rpc:{}, _sub:{}, queue:[]})
-    if (opts.socket) this.sock = polySocket(opts.socket)
+    //if (opts.socket) this.sock = polySocket(opts.socket)
+    if (opts.socket) this.sock = opts.socket
     else this.sock = new WebSocket('ws://'+(opts.host||'localhost')+':'+(opts.port||8000))
     this.sock.onopen = () => this.queue.map(_ => this.sock.send(JSON.stringify(this.queue.shift())))
     if (opts.client_id) this.auth(opts)
@@ -31,6 +32,7 @@ class Cortex {
   /* Send authorization request and set this.creds as a promise to resolve to tokens  */
   auth (args = this.opts) {
     console.log('auth:', args)
+    delete args.socket
     return this.creds = this.call('authorize', args).then(res => this.creds = res) 
    }
 

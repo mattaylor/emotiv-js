@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Smoothie Chart Example</title>
+    <script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
+  </head>
+  <body>
+    <h1>Smoothie Example</h1>
+    <canvas id="mycanvas" width="1200" height="600"></canvas>
+    <script type="text/javascript">
+      var freq = 256
+      var ival = Math.round(1000/freq)
+      var n = 15
+      var c = Math.round(((255 / (n - 1)) || 0)) 
+      var lines = []
+      var chart = new SmoothieChart({ grid: { strokeStyle: 'rgb(60, 0, 0)', fillStyle: 'rgb(30, 0, 0)', lineWidth: 1, millisPerLine: 500, verticalSections: 10 } })
+      while(n--) lines.push(new TimeSeries())
+      lines.map((line, i) => {
+        var rgb = [255-(c*i),c*i,Math.round(Math.random()*255)].join(',')
+        line.last = line.init = Math.random() * 1000
+        chart.addTimeSeries(line, { strokeStyle: 'rgba('+rgb+', 1)', fillStyle: 'rgba('+rgb+', 0)', lineWidth: 2 })
+      })
+      chart.streamTo(document.getElementById("mycanvas"), ival)
+      setInterval(() => lines.map((line, i) => {
+        line.append(new Date().getTime(), Math.round(line.last))
+        line.last -= ((Math.random() - 0.5)*(10+i*2)) + ((line.last - line.init) * 0.001 * (i+1))
+      }, ival))
+    </script>
+  </body>
+</html>
