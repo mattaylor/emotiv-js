@@ -29,36 +29,34 @@ var creds = {
   debit: 100
 }
 //var oscHost = '192.168.86.42'
-var oscHost = '192.168.86.38'
+var oscHost = '192.168.1.20'
 var oscPort = 57121
+//var oscPort = 8080
+//var oscHost = 'localhost'
 var emo = new Cortex(creds).newSession({ project:'OSC', status:'active' })
-var osc = new OSC.WebSocketPort({ url: "ws://192.168.86.38:8080", unpackSingleArgs: false, metadata: true })
-//var osc = new OSC.UDPPort({ localAddress:oscHost, localPort:oscPort, broadcast:true, metadata: true })
-//var osc = new OSC.UDPPort({ remoteAddress:oscHost, remotePort:oscPort, broadcast:true, metadata: true })
+//var oscPort = new OSC.WebSocketPort({ url: `ws://${oscHost}:{oscPort}`, unpackSingleArgs: false, metadata: true })
+var oscPort = new OSC.UDPPort({ localAddress:oscHost, localPort:oscPort, broadcast:true, metadata: true })
 //var streams = ['dev', 'mot', 'cog', 'pow', 'eeg']
-osc.open()
+oscPort.open()
 var streams = ['cog']
 console.log('starting..')
 
-var sendOsc = (str, evt) => Object.keys(evt[str]).map(key => osc.send({
+var sendOsc_ = (str, evt) => Object.keys(evt[str]).map(key => osc.send({
    address:`/emotiv/${str}/${key}`, 
    args:[ { type:'f', value: evt[str][key] } ]
 }))
 
-osc.on('ready', () => {
+var sendOsc = (str, evt) => oscPort.send({
+  timeTag: new Date().getTime(),
+  packets: Object.keys(evt[str]).map(key => ({ 
+    address:`/emotiv/${str}/${key}`, 
+    args:[ { type:'f', value: evt[str][key] } ]
+  }, oscHost, oscPort))
+})
+
+oscPort.on('ready', () => {
   console.log('OSC READY')
   streams.map(str => emo.on(str, evt => sendOsc(str, evt)))
-  //streams.map(str => emo.on(str, evt => console.log({
-    //timeTag: new Date().getTime(),
-    //packets: 
-  //streams.map(str => emo.on(str, evt => osc.send({
-    //timeTag: new Date().getTime(),
-    //packets: Object.keys(evt[str]).map(key => ({ 
-    //  address:`/emotiv/${str}/${key}`, 
-    //  args:[ { type:'f', value: evt[str][key] } ]
-    //}))
-  //})))
-  //}, oscHost, oscPort)))
 })
 
 /*
@@ -66,4 +64,16 @@ osc.on("bundle", function (oscBundle, timeTag, info) {
     console.log("An OSC bundle just arrived for time tag", timeTag, ":", oscBundle);
     console.log("Remote info is: ", info);
 });
+*/
+/*
+var osc = require("osc")
+var http = require("http") 
+var WebSocket = require("ws")
+var app = require("express")()
+var server = app.listen(8081)
+var wss = new WebSocket.Server({ server: server })
+wss.on("connection", socket => { 
+    var port = new osc.WebSocketPort({ socket: socket, metadata: true })
+    port.on("message", oscMsg => console.log("An OSC Message was received!", oscMsg))
+})
 */
